@@ -1,0 +1,292 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============ USER MANAGEMENT ============
+
+model User {
+  id           String   @id @default(cuid())
+  email        String?  @unique
+  phone        String?  @unique
+  name         String?
+  password     String?
+  avatar       String?
+  country      String?
+  bio          String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Authentication
+  isVerified   Boolean  @default(false)
+  emailVerifiedAt DateTime?
+  phoneVerifiedAt DateTime?
+  resetToken   String?
+  resetTokenExpiry DateTime?
+  verificationToken String?
+  verificationTokenExpiry DateTime?
+
+  // Social Login
+  provider     String?  // google, facebook, etc.
+  providerId   String?  // ID from the provider
+  socialAvatar String?  // Avatar URL from social login
+
+  // Stats
+  totalScore   Int      @default(0)
+  gamesPlayed  Int      @default(0)
+  gamesWon     Int      @default(0)
+  highScore    Int      @default(0)
+  level        Int      @default(1)
+  experience   Int      @default(0)
+
+  // Game settings
+  selectedSkin String?
+  selectedArena String?
+
+  // ELO rating for matchmaking
+  eloRating    Int      @default(1200)
+
+  // Relations
+  gameSessions GameSession[]
+  replays      Replay[]
+  achievements UserAchievement[]
+  inventory    Inventory[]
+  friendSent   Friendship[] @relation("FriendshipSent")
+  friendReceived Friendship[] @relation("FriendshipReceived")
+  chatMessages ChatMessage[]
+  shopPurchases ShopPurchase[]
+  battlePassProgress BattlePassProgress[]
+  challengeProgress DailyChallengeProgress[]
+}
+
+model Friendship {
+  id          String   @id @default(cuid())
+  senderId    String
+  receiverId  String
+  status      String   @default("pending") // pending, accepted, rejected, blocked
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sender      User     @relation("FriendshipSent", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("FriendshipReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+}
+
+// ============ GAME SESSIONS & REPLAYS ============
+
+model GameSession {
+  id          String   @id @default(cuid())
+  userId      String
+  score       Int
+  level       Int
+  length      Int
+  gameData    String   // JSON string of game state
+  status      String   @default("playing") // playing, paused, completed, abandoned
+  mode        String   @default("classic") // classic, pvp, battle-royale, cooperative
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completedAt DateTime?
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([score])
+}
+
+model Replay {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String?
+  score       Int
+  level       Int
+  replayData  String   // JSON string of all moves
+  duration    Int      // in seconds
+  isShared    Boolean  @default(false)
+  annotations String?   // JSON string of annotations
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([score])
+}
+
+// ============ LEADERBOARDS ============
+
+model Leaderboard {
+  id          String   @id @default(cuid())
+  userId      String
+  score       Int
+  level       Int
+  mode        String   @default("classic") // classic, pvp, battle-royale
+  period      String   @default("all-time") // all-time, weekly, daily
+  achievedAt  DateTime @default(now())
+
+  @@unique([userId, mode, period])
+  @@index([mode, period])
+  @@index([score])
+}
+
+// ============ ACHIEVEMENTS ============
+
+model Achievement {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  icon        String?
+  type        String   // score, games-played, special
+  requirement Json     // JSON object with conditions
+  reward      String?
+  xpReward   Int      @default(0)
+  maxProgress Int      @default(1)
+  createdAt   DateTime @default(now())
+
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlocked      Boolean  @default(false)
+  unlockedAt    DateTime?
+  progress      Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+}
+
+// ============ INVENTORY & SHOP ============
+
+model ShopItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  type        String   // skin, arena, power-up
+  price       Int
+  icon        String?
+  rarity      String   @default("common") // common, rare, epic, legendary
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  inventory   Inventory[]
+  purchases   ShopPurchase[]
+}
+
+model Inventory {
+  id          String   @id @default(cuid())
+  userId      String
+  itemId      String
+  acquiredAt  DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item        ShopItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+}
+
+model ShopPurchase {
+  id          String   @id @default(cuid())
+  userId      String
+  itemId      String
+  price       Int
+  purchasedAt DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item        ShopItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ============ BATTLE PASS & CHALLENGES ============
+
+model BattlePass {
+  id          String   @id @default(cuid())
+  name        String
+  season      Int
+  startDate   DateTime
+  endDate     DateTime
+  totalLevels Int      @default(100)
+  createdAt   DateTime @default(now())
+
+  progress    BattlePassProgress[]
+}
+
+model BattlePassProgress {
+  id            String   @id @default(cuid())
+  userId        String
+  battlePassId  String
+  currentLevel  Int      @default(1)
+  currentXP     Int      @default(0)
+  isCompleted   Boolean  @default(false)
+  lastClaimedAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  battlePass    BattlePass  @relation(fields: [battlePassId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, battlePassId])
+}
+
+model DailyChallenge {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  target      Int
+  reward      String
+  xpReward   Int
+  type        String   // score, games, pvp_wins, speed, single_score
+  date        DateTime
+  createdAt   DateTime @default(now())
+
+  progress    DailyChallengeProgress[]
+}
+
+model DailyChallengeProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  challengeId String
+  date        DateTime
+  progress    Int      @default(0)
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge   DailyChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, challengeId])
+}
+
+// ============ CHAT SYSTEM ============
+
+model ChatMessage {
+  id          String   @id @default(cuid())
+  userId      String
+  message     String
+  type        String   @default("global") // global, private, game
+  recipientId String?
+  gameId      String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([type])
+}
