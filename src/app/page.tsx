@@ -56,60 +56,77 @@ interface GameState {
 const GRID_SIZE = 20
 const CANVAS_SIZE = 600
 
+// Audio Context singleton
+let audioContext: AudioContext | null = null
+
+// Initialize or get the audio context
+const getAudioContext = (): AudioContext => {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+  }
+
+  // Resume the audio context if it's suspended (required by browsers)
+  if (audioContext.state === 'suspended') {
+    audioContext.resume()
+  }
+
+  return audioContext
+}
+
 // Sound effects using Web Audio API
 const playSound = (type: 'eat' | 'special' | 'powerup' | 'powerdown' | 'gameover') => {
   try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-    const oscillator = audioContext.createOscillator()
-    const gainNode = audioContext.createGain()
-    
+    const ctx = getAudioContext()
+    const oscillator = ctx.createOscillator()
+    const gainNode = ctx.createGain()
+
     oscillator.connect(gainNode)
-    gainNode.connect(audioContext.destination)
-    
+    gainNode.connect(ctx.destination)
+
     switch (type) {
       case 'eat':
         oscillator.frequency.value = 600
         oscillator.type = 'sine'
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1)
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.1)
+        gainNode.gain.setValueAtTime(0.3, ctx.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1)
+        oscillator.start(ctx.currentTime)
+        oscillator.stop(ctx.currentTime + 0.1)
         break
       case 'special':
-        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime)
-        oscillator.frequency.exponentialRampToValueAtTime(1046.5, audioContext.currentTime + 0.15)
+        oscillator.frequency.setValueAtTime(523.25, ctx.currentTime)
+        oscillator.frequency.exponentialRampToValueAtTime(1046.5, ctx.currentTime + 0.15)
         oscillator.type = 'sawtooth'
-        gainNode.gain.setValueAtTime(0.25, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.3)
+        gainNode.gain.setValueAtTime(0.25, ctx.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+        oscillator.start(ctx.currentTime)
+        oscillator.stop(ctx.currentTime + 0.3)
         break
       case 'powerup':
-        oscillator.frequency.setValueAtTime(440, audioContext.currentTime)
-        oscillator.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.1)
+        oscillator.frequency.setValueAtTime(440, ctx.currentTime)
+        oscillator.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1)
         oscillator.type = 'square'
-        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.3)
+        gainNode.gain.setValueAtTime(0.2, ctx.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+        oscillator.start(ctx.currentTime)
+        oscillator.stop(ctx.currentTime + 0.3)
         break
       case 'powerdown':
-        oscillator.frequency.setValueAtTime(880, audioContext.currentTime)
-        oscillator.frequency.exponentialRampToValueAtTime(220, audioContext.currentTime + 0.1)
+        oscillator.frequency.setValueAtTime(880, ctx.currentTime)
+        oscillator.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.1)
         oscillator.type = 'square'
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2)
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.2)
+        gainNode.gain.setValueAtTime(0.1, ctx.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2)
+        oscillator.start(ctx.currentTime)
+        oscillator.stop(ctx.currentTime + 0.2)
         break
       case 'gameover':
-        oscillator.frequency.setValueAtTime(220, audioContext.currentTime)
-        oscillator.frequency.exponentialRampToValueAtTime(110, audioContext.currentTime + 0.3)
+        oscillator.frequency.setValueAtTime(220, ctx.currentTime)
+        oscillator.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.3)
         oscillator.type = 'triangle'
-        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4)
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.4)
+        gainNode.gain.setValueAtTime(0.2, ctx.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4)
+        oscillator.start(ctx.currentTime)
+        oscillator.stop(ctx.currentTime + 0.4)
         break
     }
   } catch (error) {
@@ -680,13 +697,16 @@ export default function SnakeGame() {
 
   const startGame = () => {
     console.log('Starting game with level:', selectedLevel)
+    // Initialize audio context on user interaction
+    getAudioContext()
+
     const level = LEVELS.find(l => l.id === selectedLevel)
     if (level) {
       const canvasSize = Math.min(600, Math.max(400, level.gridWidth * 30))
       const spawnX = level.walls.spawnPosition?.x || Math.floor(level.gridWidth / 2)
       const spawnY = level.walls.spawnPosition?.y || Math.floor(level.gridHeight / 2)
       const initialSnake = [{ x: spawnX, y: spawnY }]
-      
+
       setGameState({
         snake: initialSnake,
         food: findValidFoodPosition(selectedLevel, initialSnake),
