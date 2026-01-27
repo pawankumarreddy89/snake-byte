@@ -1534,46 +1534,130 @@ export default function SnakeGame() {
                     )}
                   </div>
 
-                  <div className="relative flex justify-center">
-                    <canvas
-                      ref={canvasRef}
-                      width={gameState.canvasSize}
-                      height={gameState.canvasSize}
-                      className="rounded-lg border border-slate-300 dark:border-slate-700/60 w-full max-w-[95vw] md:max-w-full h-auto touch-none"
-                      style={{ maxHeight: '50vh', minHeight: '300px' }}
-                    />
+                  {/* Game Canvas Container - Redesigned */}
+                  <div className="relative">
+                    {/* Decorative outer glow */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 rounded-2xl blur opacity-20 dark:opacity-30 animate-pulse"></div>
+                    
+                    {/* Game Box Frame */}
+                    <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-1 md:p-2 border-2 border-slate-300 dark:border-slate-600 shadow-2xl">
+                      {/* Corner decorations */}
+                      <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-purple-500 rounded-tl-lg"></div>
+                      <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-pink-500 rounded-tr-lg"></div>
+                      <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-orange-500 rounded-bl-lg"></div>
+                      <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-yellow-500 rounded-br-lg"></div>
+                      
+                      {/* Inner canvas container */}
+                      <div className="relative bg-slate-900 dark:bg-slate-950 rounded-xl overflow-hidden">
+                        {/* Grid pattern background */}
+                        <div className="absolute inset-0 opacity-10 dark:opacity-20">
+                          <div className="w-full h-full" style={{
+                            backgroundImage: `
+                              linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
+                            `,
+                            backgroundSize: '20px 20px'
+                          }}></div>
+                        </div>
+                        
+                        {/* Canvas */}
+                        <div className="relative flex justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
+                          <canvas
+                            ref={canvasRef}
+                            width={gameState.canvasSize}
+                            height={gameState.canvasSize}
+                            className="rounded-lg w-full max-w-[95vw] md:max-w-full h-auto touch-none relative z-10"
+                            style={{ maxHeight: '50vh', minHeight: '300px' }}
+                          />
 
-                    {/* Game Over Overlay */}
-                    {gameState.isGameOver && (
-                      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
-                        <div className="text-center space-y-4 sm:space-y-6 px-4">
-                          <div>
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent dark:from-red-400 dark:to-orange-400 mb-1 sm:mb-2">Game Over!</h2>
-                            <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent dark:from-green-400 dark:to-emerald-400">Score: {gameState.score}</p>
-                            <p className="text-base sm:text-lg font-semibold text-foreground dark:text-slate-300">Level: {gameState.level}</p>
+                          {/* Game Over Overlay */}
+                          {gameState.isGameOver && (
+                            <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-20">
+                              <div className="text-center space-y-4 sm:space-y-6 px-4 py-8">
+                                {/* Game Over Badge */}
+                                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-2 rounded-full shadow-lg shadow-red-500/30">
+                                  <Trophy className="w-6 h-6" />
+                                  <span className="text-lg font-bold">GAME OVER</span>
+                                </div>
+                                
+                                {/* Score Display */}
+                                <div className="space-y-2">
+                                  <p className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                                    {gameState.score}
+                                  </p>
+                                  <p className="text-slate-400 text-sm uppercase tracking-widest">Final Score</p>
+                                </div>
+                                
+                                {/* Stats */}
+                                <div className="flex justify-center gap-6 sm:gap-8">
+                                  <div className="text-center">
+                                    <p className="text-2xl sm:text-3xl font-bold text-purple-400">{gameState.level}</p>
+                                    <p className="text-xs text-slate-400 uppercase tracking-wider">Level</p>
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-2xl sm:text-3xl font-bold text-blue-400">{gameState.snake.length}</p>
+                                    <p className="text-xs text-slate-400 uppercase tracking-wider">Length</p>
+                                  </div>
+                                </div>
+                                
+                                {/* Action Buttons */}
+                                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4">
+                                  <Button
+                                    size="lg"
+                                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg px-8 py-6 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-all hover:scale-105"
+                                    onClick={startGame}
+                                  >
+                                    <Play className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                                    Play Again
+                                  </Button>
+                                  <Button
+                                    size="lg"
+                                    variant="outline"
+                                    className="border-2 border-slate-600 text-slate-300 hover:bg-slate-800/50 hover:border-slate-500 text-base sm:text-lg px-8 py-6 transition-all hover:scale-105"
+                                    onClick={resetGame}
+                                  >
+                                    <Menu className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                                    Menu
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Pause Overlay */}
+                          {gameState.isPaused && !gameState.isGameOver && (
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-20">
+                              <div className="text-center space-y-4">
+                                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg shadow-yellow-500/30 animate-pulse">
+                                  <Pause className="w-10 h-10 text-white" />
+                                </div>
+                                <h3 className="text-2xl sm:text-3xl font-bold text-white">PAUSED</h3>
+                                <p className="text-slate-400 text-sm">Click the play button to continue</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Score HUD (Floating) */}
+                          <div className="absolute top-3 left-3 right-3 flex justify-between z-10 pointer-events-none">
+                            <div className="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/10">
+                              <span className="text-xs text-slate-400 uppercase tracking-wider">Score</span>
+                              <p className="text-lg font-bold text-green-400">{gameState.score}</p>
+                            </div>
+                            <div className="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/10">
+                              <span className="text-xs text-slate-400 uppercase tracking-wider">Level</span>
+                              <p className="text-base font-bold text-purple-400">{gameState.level}</p>
+                            </div>
                           </div>
-                          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
-                            <Button
-                              size="lg"
-                              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-sm sm:text-base"
-                              onClick={startGame}
-                            >
-                              <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                              Play Again
-                            </Button>
-                            <Button
-                              size="lg"
-                              variant="outline"
-                              className="border-slate-600 text-slate-300 hover:bg-slate-700/50 text-sm sm:text-base"
-                              onClick={resetGame}
-                            >
-                              <Menu className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                              Main Menu
-                            </Button>
-                          </div>
+
+                          {/* Special Food Indicator */}
+                          {gameState.isSpecialFood && (
+                            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg shadow-yellow-500/30 animate-bounce z-10">
+                              ⭐ SPECIAL FOOD - {Math.max(0, Math.ceil((gameState.specialFoodEndTime - Date.now()) / 1000))}s
+                            </div>
+                          )}
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
 
 
