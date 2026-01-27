@@ -1638,14 +1638,14 @@ export default function SnakeGame() {
                           )}
 
                           {/* Score HUD (Floating) */}
-                          <div className="absolute top-3 left-3 right-3 flex justify-between z-10 pointer-events-none">
-                            <div className="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/10">
-                              <span className="text-xs text-slate-400 uppercase tracking-wider">Score</span>
-                              <p className="text-lg font-bold text-green-400">{gameState.score}</p>
+                          <div className="absolute top-2 left-2 right-2 flex justify-between z-10 pointer-events-none">
+                            <div className="bg-black/20 dark:bg-black/30 backdrop-blur-[2px] rounded-lg px-2 py-1 border border-white/5">
+                              <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">Score</span>
+                              <p className="text-base sm:text-lg font-bold text-green-400">{gameState.score}</p>
                             </div>
-                            <div className="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/10">
-                              <span className="text-xs text-slate-400 uppercase tracking-wider">Level</span>
-                              <p className="text-base font-bold text-purple-400">{gameState.level}</p>
+                            <div className="bg-black/20 dark:bg-black/30 backdrop-blur-[2px] rounded-lg px-2 py-1 border border-white/5">
+                              <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">Level</span>
+                              <p className="text-sm sm:text-base font-bold text-purple-400">{gameState.level}</p>
                             </div>
                           </div>
 
