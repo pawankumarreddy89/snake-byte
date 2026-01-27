@@ -1477,9 +1477,9 @@ export default function SnakeGame() {
             </div>
           ) : (
             /* Game Interface */
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-center items-start min-h-screen lg:min-h-0">
+            <div className="flex flex-col gap-2 sm:gap-4 lg:gap-6 justify-center items-start min-h-screen lg:min-h-0 pb-4">
               {/* Game Canvas */}
-              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 w-full lg:w-auto flex-1">
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 w-full lg:w-auto">
                 <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-4 md:px-6 py-2 sm:py-4">
                   <div className="flex items-center justify-between">
                     <CardTitle className="bg-gradient-to-r from-purple-600 dark:from-purple-400 via-pink-500 dark:via-pink-400 to-orange-500 dark:to-orange-400 bg-clip-text text-transparent text-base sm:text-lg md:text-xl">Game Area</CardTitle>
@@ -1659,14 +1659,16 @@ export default function SnakeGame() {
                       </div>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
 
-
-                  {/* Mobile Controls - Retro D-Pad Style */}
-                  <div className="md:hidden mt-2 sm:mt-4">
-                    <div className="flex flex-col items-center space-y-2 sm:space-y-4">
-                      {/* D-Pad */}
-                      <div className="bg-white/50 dark:bg-slate-800/80 backdrop-blur rounded-2xl p-2 sm:p-4 border border-slate-300 dark:border-slate-600/60 shadow-2xl">
-                        <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
+              {/* Mobile Controls - Retro D-Pad Style - Outside Card for better visibility */}
+              <div className="md:hidden w-full pb-4 pt-2">
+                <div className="flex flex-col items-center space-y-2 sm:space-y-3">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Controls</p>
+                  {/* D-Pad */}
+                  <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg rounded-2xl p-2 sm:p-4 border-2 border-slate-400 dark:border-slate-600 shadow-2xl">
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
                           {/* Empty top corners */}
                           <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
                           {/* Up Button */}
@@ -1770,11 +1772,8 @@ export default function SnakeGame() {
                           <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
                         </Button>
                       </div>
-                      </div>
                     </div>
-
-                </CardContent>
-              </Card>
+              </div>
 
               {/* Side Panel - Hidden on mobile, visible on desktop */}
               <div className="hidden lg:block w-80 space-y-4">
