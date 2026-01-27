@@ -1477,17 +1477,17 @@ export default function SnakeGame() {
             </div>
           ) : (
             /* Game Interface */
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-center items-start">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-center items-start min-h-screen lg:min-h-0">
               {/* Game Canvas */}
-              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50 w-full lg:w-auto">
-                <CardHeader className="pb-4 px-4 md:px-6">
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 w-full lg:w-auto flex-1">
+                <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-4 md:px-6 py-2 sm:py-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-lg md:text-xl">Game Area</CardTitle>
+                    <CardTitle className="bg-gradient-to-r from-purple-600 dark:from-purple-400 via-pink-500 dark:via-pink-400 to-orange-500 dark:to-orange-400 bg-clip-text text-transparent text-base sm:text-lg md:text-xl">Game Area</CardTitle>
                     <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className={`h-8 w-8 ${soundEnabled ? 'text-slate-400 hover:text-green-400' : 'text-slate-600 hover:text-slate-400'}`}
+                        className={`h-8 w-8 ${soundEnabled ? 'text-slate-600 dark:text-slate-400 hover:text-green-400' : 'text-slate-400 dark:text-slate-600 hover:text-slate-300'}`}
                         onClick={() => setSoundEnabled(!soundEnabled)}
                         title={soundEnabled ? 'Mute Sound' : 'Unmute Sound'}
                       >
@@ -1504,29 +1504,29 @@ export default function SnakeGame() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4 px-4 md:px-6">
+                <CardContent className="space-y-2 sm:space-y-4 px-2 sm:px-4 md:px-6 pb-2 sm:pb-6">
                   {/* Mobile Stats - Only visible on mobile */}
-                  <div className="flex md:hidden flex-wrap justify-around items-center bg-slate-900/50 rounded-lg p-3 space-x-2">
+                  <div className="flex md:hidden flex-wrap justify-around items-center bg-slate-200/50 dark:bg-slate-700/40 rounded-lg p-2 sm:p-3 space-x-1 sm:space-x-2 border border-slate-300 dark:border-slate-600">
                     <div className="text-center">
-                      <div className="text-xs text-slate-400">Score</div>
-                      <div className="text-xl font-bold text-green-400">{gameState.score}</div>
+                      <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400">Score</div>
+                      <div className="text-lg sm:text-xl font-bold text-green-400">{gameState.score}</div>
                     </div>
-                    <div className="w-px h-10 bg-slate-700"></div>
+                    <div className="w-px h-8 sm:h-10 bg-slate-300 dark:bg-slate-700"></div>
                     <div className="text-center">
-                      <div className="text-xs text-slate-400">Level</div>
-                      <div className="text-lg font-bold text-purple-400">{gameState.level}</div>
+                      <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400">Level</div>
+                      <div className="text-base sm:text-lg font-bold text-purple-400">{gameState.level}</div>
                     </div>
-                    <div className="w-px h-10 bg-slate-700"></div>
+                    <div className="w-px h-8 sm:h-10 bg-slate-300 dark:bg-slate-700"></div>
                     <div className="text-center">
-                      <div className="text-xs text-slate-400">Length</div>
-                      <div className="text-lg font-bold text-blue-400">{gameState.snake.length}</div>
+                      <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400">Length</div>
+                      <div className="text-base sm:text-lg font-bold text-blue-400">{gameState.snake.length}</div>
                     </div>
                     {gameState.isSpecialFood && (
                       <>
-                        <div className="w-px h-10 bg-slate-700"></div>
+                        <div className="w-px h-8 sm:h-10 bg-slate-300 dark:bg-slate-700"></div>
                         <div className="text-center">
-                          <div className="text-xs text-yellow-400 font-semibold">⭐ SPECIAL</div>
-                          <div className="text-lg font-bold text-yellow-400">
+                          <div className="text-[10px] sm:text-xs text-yellow-400 font-semibold">⭐ SPECIAL</div>
+                          <div className="text-base sm:text-lg font-bold text-yellow-400">
                             {Math.max(0, Math.ceil((gameState.specialFoodEndTime - Date.now()) / 1000))}s
                           </div>
                         </div>
@@ -1539,35 +1539,35 @@ export default function SnakeGame() {
                       ref={canvasRef}
                       width={gameState.canvasSize}
                       height={gameState.canvasSize}
-                      className="rounded-lg border border-slate-700/60 max-w-full h-auto"
-                      style={{ maxWidth: '100%', height: 'auto' }}
+                      className="rounded-lg border border-slate-300 dark:border-slate-700/60 w-full max-w-[95vw] md:max-w-full h-auto touch-none"
+                      style={{ maxHeight: '50vh', minHeight: '300px' }}
                     />
 
                     {/* Game Over Overlay */}
                     {gameState.isGameOver && (
                       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
-                        <div className="text-center space-y-6">
+                        <div className="text-center space-y-4 sm:space-y-6 px-4">
                           <div>
-                            <h2 className="text-4xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent dark:from-red-400 dark:to-orange-400 mb-2">Game Over!</h2>
-                            <p className="text-2xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent dark:from-green-400 dark:to-emerald-400">Score: {gameState.score}</p>
-                            <p className="text-lg font-semibold text-foreground dark:text-slate-300">Level: {gameState.level}</p>
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent dark:from-red-400 dark:to-orange-400 mb-1 sm:mb-2">Game Over!</h2>
+                            <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent dark:from-green-400 dark:to-emerald-400">Score: {gameState.score}</p>
+                            <p className="text-base sm:text-lg font-semibold text-foreground dark:text-slate-300">Level: {gameState.level}</p>
                           </div>
-                          <div className="flex gap-3 justify-center">
+                          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
                             <Button
                               size="lg"
-                              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-sm sm:text-base"
                               onClick={startGame}
                             >
-                              <Play className="w-5 h-5 mr-2" />
+                              <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                               Play Again
                             </Button>
                             <Button
                               size="lg"
                               variant="outline"
-                              className="border-slate-600 text-slate-300 hover:bg-slate-700/50"
+                              className="border-slate-600 text-slate-300 hover:bg-slate-700/50 text-sm sm:text-base"
                               onClick={resetGame}
                             >
-                              <Menu className="w-5 h-5 mr-2" />
+                              <Menu className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                               Main Menu
                             </Button>
                           </div>
@@ -1578,19 +1578,19 @@ export default function SnakeGame() {
 
 
                   {/* Mobile Controls - Retro D-Pad Style */}
-                  <div className="md:hidden mt-6">
-                    <div className="flex flex-col items-center space-y-4">
+                  <div className="md:hidden mt-2 sm:mt-4">
+                    <div className="flex flex-col items-center space-y-2 sm:space-y-4">
                       {/* D-Pad */}
-                      <div className="bg-slate-800/80 backdrop-blur rounded-2xl p-4 border border-slate-600/60 shadow-2xl">
-                        <div className="grid grid-cols-3 gap-3">
+                      <div className="bg-white/50 dark:bg-slate-800/80 backdrop-blur rounded-2xl p-2 sm:p-4 border border-slate-300 dark:border-slate-600/60 shadow-2xl">
+                        <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
                           {/* Empty top corners */}
-                          <div className="w-14 h-14"></div>
+                          <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
                           {/* Up Button */}
                           <button
-                            className={`w-14 h-14 rounded-xl text-2xl font-bold transition-all duration-100 ${
+                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl text-xl sm:text-2xl font-bold transition-all duration-100 active:scale-95 ${
                               gameState.direction === 'up'
                                 ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
-                                : 'bg-gradient-to-br from-slate-700 to-slate-800 text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
+                                : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
                             }`}
                             onClick={() => {
                               if (gameState.direction !== 'down') {
@@ -1601,14 +1601,14 @@ export default function SnakeGame() {
                             ▲
                           </button>
                           {/* Empty top right */}
-                          <div className="w-14 h-14"></div>
+                          <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
 
                           {/* Left Button */}
                           <button
-                            className={`w-14 h-14 rounded-lg text-2xl font-bold transition-all duration-100 ${
+                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg text-xl sm:text-2xl font-bold transition-all duration-100 active:scale-95 ${
                               gameState.direction === 'left'
                                 ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
-                                : 'bg-gradient-to-br from-slate-700 to-slate-800 text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
+                                : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
                             }`}
                             onClick={() => {
                               if (gameState.direction !== 'right') {
@@ -1620,7 +1620,7 @@ export default function SnakeGame() {
                           </button>
                           {/* Center - Action Button */}
                           <button
-                            className={`w-14 h-14 rounded-lg text-xl font-bold transition-all duration-100 ${
+                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg text-base sm:text-xl font-bold transition-all duration-100 active:scale-95 ${
                               gameState.isPaused
                                 ? 'bg-gradient-to-br from-green-600 to-green-800 text-white shadow-lg shadow-green-500/50'
                                 : 'bg-gradient-to-br from-yellow-600 to-yellow-800 text-white shadow-lg shadow-yellow-500/50'
@@ -1631,10 +1631,10 @@ export default function SnakeGame() {
                           </button>
                           {/* Right Button */}
                           <button
-                            className={`w-14 h-14 rounded-lg text-2xl font-bold transition-all duration-100 ${
+                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg text-xl sm:text-2xl font-bold transition-all duration-100 active:scale-95 ${
                               gameState.direction === 'right'
                                 ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
-                                : 'bg-gradient-to-br from-slate-700 to-slate-800 text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
+                                : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
                             }`}
                             onClick={() => {
                               if (gameState.direction !== 'left') {
@@ -1646,13 +1646,13 @@ export default function SnakeGame() {
                           </button>
 
                           {/* Empty bottom left */}
-                          <div className="w-14 h-14"></div>
+                          <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
                           {/* Down Button */}
                           <button
-                            className={`w-14 h-14 rounded-lg text-2xl font-bold transition-all duration-100 ${
+                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg text-xl sm:text-2xl font-bold transition-all duration-100 active:scale-95 ${
                               gameState.direction === 'down'
                                 ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
-                                : 'bg-gradient-to-br from-slate-700 to-slate-800 text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
+                                : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
                             }`}
                             onClick={() => {
                               if (gameState.direction !== 'up') {
@@ -1663,27 +1663,27 @@ export default function SnakeGame() {
                             ▼
                           </button>
                           {/* Empty bottom right */}
-                          <div className="w-14 h-14"></div>
+                          <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
                         </div>
                       </div>
 
                       {/* Action Bar */}
-                      <div className="flex gap-3 justify-center">
+                      <div className="flex gap-2 sm:gap-3 justify-center">
                         <Button
                           variant="outline"
                           size="default"
-                          className="w-12 h-12 bg-slate-800/90 border-slate-600/60 text-slate-300 hover:bg-slate-700 active:bg-slate-600"
+                          className="w-10 h-10 sm:w-12 sm:h-12 bg-white/50 dark:bg-slate-800/90 border-slate-400 dark:border-slate-600/60 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 active:bg-slate-200 dark:active:bg-slate-600"
                           onClick={() => setShowMenu(true)}
                         >
-                          <Menu className="w-5 h-5" />
+                          <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
                         </Button>
                         <Button
                           variant="outline"
                           size="default"
-                          className="w-12 h-12 bg-slate-800/90 border-red-600/60 text-red-300 hover:bg-slate-700 hover:border-red-500/60 active:bg-slate-600"
+                          className="w-10 h-10 sm:w-12 sm:h-12 bg-white/50 dark:bg-slate-800/90 border-red-500/60 dark:border-red-600/60 text-red-500 dark:text-red-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:border-red-500/60 dark:hover:border-red-500/60 active:bg-slate-200 dark:active:bg-slate-600"
                           onClick={resetGame}
                         >
-                          <RotateCcw className="w-5 h-5" />
+                          <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
                         </Button>
                       </div>
                       </div>
