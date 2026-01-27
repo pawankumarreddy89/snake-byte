@@ -507,7 +507,7 @@ export default function SnakeGame() {
         
         // Determine if next food should be special (every 5th food)
         const shouldSpawnSpecial = newFoodEaten % 5 === 0 && !prev.isSpecialFood
-        const specialFoodDuration = 10000 // 10 seconds for special food
+        const specialFoodDuration = 5000 // 5 seconds for special food
         
         // Play appropriate sound
         if (soundEnabled) {
