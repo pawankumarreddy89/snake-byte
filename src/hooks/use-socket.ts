@@ -10,8 +10,9 @@ interface UseSocketOptions {
 }
 
 interface GameState {
-  food: { x: number; y: number }
-  obstacles: { x: number; y: number }[]
+  food?: { x: number; y: number }
+  snake?: any[]
+  obstacles?: { x: number; y: number }[]
   players: Array<{
     id: string
     name: string

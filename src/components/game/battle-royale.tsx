@@ -412,30 +412,6 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
     }
   }, [isPlaying, isSpectator, arenaSize, localPlayer])
 
-  function spawnPowerUp() {
-    const types: PowerUp['type'][] = ['speed', 'shield', 'slow', 'points']
-    const type = types[Math.floor(Math.random() * types.length)]
-
-    // Random position within current arena
-    const x = Math.floor(Math.random() * arenaSize)
-    const y = Math.floor(Math.random() * arenaSize)
-
-    const newPowerUp: PowerUp = {
-      id: `powerup-${Date.now()}-${Math.random()}`,
-      type,
-      x,
-      y,
-      duration: 10000 // 10 seconds
-    }
-
-    setPowerUps(prev => [...prev, newPowerUp])
-
-    // Remove after duration
-    setTimeout(() => {
-      setPowerUps(prev => prev.filter(p => p.id !== newPowerUp.id))
-    }, 10000)
-  }
-
   // Handle keyboard input
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -501,13 +477,13 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
           newHead.y < 0 ||
           newHead.y >= arenaSize
         ) {
-          socket.gameOver(localPlayer.score, [socket.playerId])
+          socket.gameOver(localPlayer.score, socket.playerId ? [socket.playerId] : [])
           return
         }
 
         // Self collision
         if (snake.some(s => s.x === newHead.x && s.y === newHead.y)) {
-          socket.gameOver(localPlayer.score, [socket.playerId])
+          socket.gameOver(localPlayer.score, socket.playerId ? [socket.playerId] : [])
           return
         }
 
@@ -534,27 +510,6 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [isPlaying, isSpectator, localPlayer, powerUps, socket.gameState, arenaSize])
-
-  function applyPowerUp(powerUp: PowerUp) {
-    switch (powerUp.type) {
-      case 'speed':
-        setActivePowerUp({ type: 'Speed Boost', remaining: 10 })
-        setTimeout(() => setActivePowerUp(null), 10000)
-        break
-      case 'shield':
-        setActivePowerUp({ type: 'Shield', remaining: 10 })
-        setTimeout(() => setActivePowerUp(null), 10000)
-        break
-      case 'slow':
-        // Slow down all other players
-        setActivePowerUp({ type: 'Slow', remaining: 10 })
-        setTimeout(() => setActivePowerUp(null), 10000)
-        break
-      case 'points':
-        socket.eatFood(50)
-        break
-    }
-  }
 
   const handleJoin = () => {
     if (!playerName.trim()) {
@@ -588,19 +543,6 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
     setChatInput('')
   }
 
-  function shadeColor(color: string, percent: number) {
-    const num = parseInt(color.replace('#', ''), 16)
-    const amt = Math.round(2.55 * percent)
-    const R = (num >> 16) + amt
-    const G = (num >> 8 & 0x00FF) + amt
-    const B = (num & 0x0000FF) + amt
-    return '#' + (0x1000000 +
-      (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
-      (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
-      (B < 255 ? (B < 1 ? 0 : B) : 255)
-    ).toString(16).slice(1)
-  }
-
   const allPlayers = [localPlayer, ...otherPlayers].filter((p): p is Player => p !== null)
   const survivorCount = allPlayers.filter(p => !p.eliminated).length
 
@@ -615,7 +557,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
             </div>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent dark:from-red-400 dark:to-orange-400">Battle Royale</h1>
-              <p className="text-muted-foreground dark:text-slate-400 text-sm">Last snake standing wins!</p>
+              <p className="text-muted-foreground dark:text-slate-200 text-sm">Last snake standing wins!</p>
             </div>
           </div>
           {isInRoom ? (
@@ -636,7 +578,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
           <div className="lg:col-span-2">
             {!isInRoom && (
               /* Lobby Screen */
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader className="text-center pb-6">
                   <div className="mx-auto mb-4 w-24 h-24 bg-gradient-to-br from-red-500 to-orange-600 rounded-2xl flex items-center justify-center">
                     <Skull className="w-12 h-12 text-white" />
@@ -657,7 +599,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
                       value={playerName}
                       onChange={(e) => setPlayerName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-900/50border-border dark:border-slate-700 text-white text-lg py-3"
+                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-600/30border-border dark:border-slate-700 text-white text-lg py-3"
                       maxLength={20}
                     />
                   </div>
@@ -702,7 +644,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
 
             {isInRoom && isWaiting && (
               /* Waiting / Countdown Screen */
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardContent className="py-16 text-center">
                   {countdown !== null ? (
                     <div>
@@ -719,7 +661,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
                       <h2 className="text-3xl font-bold text-white mb-2">
                         Waiting for Battle...
                       </h2>
-                      <p className="text-muted-foreground dark:text-slate-400 text-lg">
+                      <p className="text-muted-foreground dark:text-slate-200 text-lg">
                         {socket.players.length} / 8 players joined
                       </p>
                       <div className="mt-4 flex items-center justify-center gap-2">
@@ -734,7 +676,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
 
             {isInRoom && (isPlaying || isSpectator) && (
               /* Game Screen */
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-foreground dark:text-white">
@@ -793,10 +735,10 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
                         key={player.id}
                         className={`flex items-center gap-2 p-2 rounded-lg ${
                           player.eliminated
-                            ? 'bg-muted/50 dark:bg-slate-900/50opacity-50'
+                            ? 'bg-muted/50 dark:bg-slate-600/30opacity-50'
                             : player.id === socket.playerId
                             ? 'bg-purple-500/20 border border-purple-500/30'
-                            : 'bg-muted/50 dark:bg-slate-900/50border border-slate-700/50'
+                            : 'bg-muted/50 dark:bg-slate-600/30border border-slate-700/50'
                         }`}
                       >
                         <div
@@ -833,7 +775,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
                         <Eye className="w-5 h-5 text-orange-400" />
                         <h3 className="text-lg font-bold text-orange-300">You are Spectating</h3>
                       </div>
-                      <p className="text-muted-foreground dark:text-slate-400 text-sm">
+                      <p className="text-muted-foreground dark:text-slate-200 text-sm">
                         Watch the battle unfold! You will be able to join the next match.
                       </p>
                     </div>
@@ -844,7 +786,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
 
             {isInRoom && gameResult && (
               /* Game Result Screen */
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardContent className="py-16 text-center">
                   <div className="mb-6">
                     {gameResult.position === 1 ? (
@@ -897,7 +839,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
           {/* Side Panel - Info */}
           <div className="space-y-6">
             {/* Game Info Card */}
-            <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+            <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Target className="w-5 h-5 text-red-400" />
@@ -935,28 +877,28 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
                       <span className="text-2xl">⚡</span>
                       <div>
                         <p className="text-white font-medium">Speed Boost</p>
-                        <p className="text-muted-foreground dark:text-slate-400 text-xs">Move faster for 10s</p>
+                        <p className="text-muted-foreground dark:text-slate-200 text-xs">Move faster for 10s</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">🛡️</span>
                       <div>
                         <p className="text-white font-medium">Shield</p>
-                        <p className="text-muted-foreground dark:text-slate-400 text-xs">Temporary immunity</p>
+                        <p className="text-muted-foreground dark:text-slate-200 text-xs">Temporary immunity</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">❄️</span>
                       <div>
                         <p className="text-white font-medium">Slow</p>
-                        <p className="text-muted-foreground dark:text-slate-400 text-xs">Slow others</p>
+                        <p className="text-muted-foreground dark:text-slate-200 text-xs">Slow others</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">💎</span>
                       <div>
                         <p className="text-white font-medium">Bonus Points</p>
-                        <p className="text-muted-foreground dark:text-slate-400 text-xs">+50 instant points</p>
+                        <p className="text-muted-foreground dark:text-slate-200 text-xs">+50 instant points</p>
                       </div>
                     </div>
                   </div>
@@ -965,7 +907,7 @@ export function BattleRoyale({ onExit }: BattleRoyaleProps) {
             </Card>
 
             {/* Arena Status */}
-            <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+            <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Clock className="w-5 h-5 text-orange-400" />

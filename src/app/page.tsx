@@ -148,12 +148,12 @@ function LeaderboardDisplay({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-100 dark:from-indigo-900 dark:via-purple-900 dark:to-slate-800 flex flex-col">
       {/* Header */}
-      <header className="bg-background/80 dark:bg-slate-900/50 backdrop-blur-lg border-b border-border px-6 py-4">
+      <header className="bg-background/80 dark:bg-slate-700/30 backdrop-blur-lg border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={onClose} className="text-foreground/70 hover:text-foreground dark:text-slate-400 dark:hover:text-white">
+            <Button variant="ghost" size="icon" onClick={onClose} className="text-foreground/70 hover:text-foreground dark:text-slate-200 dark:hover:text-white">
               <Trophy className="w-6 h-6" />
             </Button>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400">Global Leaderboards</h1>
@@ -168,11 +168,11 @@ function LeaderboardDisplay({ onClose }: { onClose: () => void }) {
       <main className="flex-1 p-6">
         <div className="max-w-4xl mx-auto">
           {/* Filters */}
-          <Card className="bg-background/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50 mb-6">
+          <Card className="bg-background/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50 mb-6">
             <CardContent className="pt-6">
               <div className="flex flex-wrap gap-4 justify-center">
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground dark:text-slate-400">Mode:</span>
+                  <span className="text-muted-foreground dark:text-slate-200">Mode:</span>
                   <div className="flex gap-2">
                     <Button
                       variant={mode === 'classic' ? 'default' : 'outline'}
@@ -191,7 +191,7 @@ function LeaderboardDisplay({ onClose }: { onClose: () => void }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground dark:text-slate-400">Period:</span>
+                  <span className="text-muted-foreground dark:text-slate-200">Period:</span>
                   <div className="flex gap-2">
                     <Button
                       variant={period === 'all-time' ? 'default' : 'outline'}
@@ -214,24 +214,24 @@ function LeaderboardDisplay({ onClose }: { onClose: () => void }) {
           </Card>
 
           {/* Leaderboard Table */}
-          <Card className="bg-background/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+          <Card className="bg-background/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
             <CardHeader>
               <CardTitle className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-400">Top Players</CardTitle>
-              <CardDescription className="text-muted-foreground dark:text-slate-400">
+              <CardDescription className="text-muted-foreground dark:text-slate-200">
                 {mode.charAt(0).toUpperCase() + mode.slice(1)} • {period.charAt(0).toUpperCase() + period.slice(1)}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="text-center py-12 text-muted-foreground dark:text-slate-400">Loading...</div>
+                <div className="text-center py-12 text-muted-foreground dark:text-slate-200">Loading...</div>
               ) : leaderboards.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground dark:text-slate-400">No records found</div>
+                <div className="text-center py-12 text-muted-foreground dark:text-slate-200">No records found</div>
               ) : (
                 <div className="space-y-2">
                   {leaderboards.map((entry, index) => (
                     <div
                       key={entry.id}
-                      className="flex items-center justify-between p-4 bg-muted/50 dark:bg-slate-900/50 rounded-lg border border-border dark:border-slate-700/50 hover:bg-muted/80 dark:hover:border-slate-600/50 transition-colors"
+                      className="flex items-center justify-between p-4 bg-muted/50 dark:bg-slate-700/30 rounded-lg border border-border dark:border-slate-500/50 hover:bg-muted/80 dark:hover:border-slate-600/50 transition-colors"
                     >
                       <div className="flex items-center gap-4">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
@@ -245,12 +245,12 @@ function LeaderboardDisplay({ onClose }: { onClose: () => void }) {
                         <div className="text-2xl">{entry.avatar || '👤'}</div>
                         <div>
                           <div className="font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent dark:from-blue-400 dark:to-cyan-400">{entry.name || 'Anonymous'}</div>
-                          <div className="text-sm text-muted-foreground dark:text-slate-400">Level {entry.level}</div>
+                          <div className="text-sm text-muted-foreground dark:text-slate-200">Level {entry.level}</div>
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-green-500 dark:text-green-400">{entry.score.toLocaleString()}</div>
-                        <div className="text-xs text-muted-foreground dark:text-slate-400">points</div>
+                        <div className="text-xs text-muted-foreground dark:text-slate-200">points</div>
                       </div>
                     </div>
                   ))}
@@ -268,7 +268,7 @@ export default function SnakeGame() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const gameLoopRef = useRef<number>()
+  const gameLoopRef = useRef<number | undefined>(undefined)
   const [gameState, setGameState] = useState<GameState>({
     snake: [{ x: 10, y: 10 }],
     food: { x: 15, y: 15 },
@@ -949,9 +949,9 @@ export default function SnakeGame() {
   }, [gameState])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-100 dark:from-indigo-900 dark:via-purple-900 dark:to-slate-800 flex flex-col">
       {/* Header */}
-      <header className="bg-background/80 dark:bg-slate-900/50 backdrop-blur-lg border-b border-border dark:border-slate-700/50 px-3 md:px-6 py-3 md:py-4">
+      <header className="bg-background/80 dark:bg-slate-700/30 backdrop-blur-lg border-b border-border dark:border-slate-500/50 px-3 md:px-6 py-3 md:py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-1 md:gap-4">
             <h1 className="text-lg md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent">
@@ -966,9 +966,9 @@ export default function SnakeGame() {
             <Button
               variant="ghost"
               size="default"
-              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-400 dark:hover:text-purple-400"
+              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              title={mounted ? (theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode') : ''}
             >
               {!mounted ? (
                 <div className="w-5 h-5 md:w-5 md:h-5 lg:w-4 lg:h-4" />
@@ -981,7 +981,7 @@ export default function SnakeGame() {
             <Button
               variant="ghost"
               size="default"
-              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-400 dark:hover:text-purple-400"
+              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
               onClick={() => setShowSettings(true)}
               title="Settings"
             >
@@ -990,7 +990,7 @@ export default function SnakeGame() {
             <Button
               variant="ghost"
               size="default"
-              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-400 dark:hover:text-purple-400"
+              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
               onClick={() => {
                 setProfileActiveTab('overview')
                 setShowProfile(!showProfile)
@@ -1002,7 +1002,7 @@ export default function SnakeGame() {
             <Button
               variant="ghost"
               size="default"
-              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-400 dark:hover:text-purple-400"
+              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
               onClick={() => setShowAdmin(!showAdmin)}
               title="Admin Dashboard"
             >
@@ -1010,7 +1010,7 @@ export default function SnakeGame() {
             </Button>
             {user ? (
               <div className="flex items-center gap-2 md:gap-3">
-                <div className="flex items-center gap-2 bg-muted/50 dark:bg-slate-800/50 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2 bg-muted/50 dark:bg-slate-700/40 rounded-lg px-3 py-2">
                   <span className="text-2xl md:text-xl lg:text-base">{user.avatar || '🎮'}</span>
                   <div className="flex flex-col">
                     <span className="text-slate-200 font-medium text-sm md:text-base">{user.name}</span>
@@ -1059,7 +1059,7 @@ export default function SnakeGame() {
           ) : showMenu ? (
             /* Main Menu */
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-4">
-              <Card className="w-full max-w-4xl bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="w-full max-w-4xl bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader className="text-center pb-4 md:pb-8">
                   <div className="mx-auto mb-4 w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center">
                     <Gamepad2 className="w-8 h-8 md:w-12 md:h-12 text-white" />
@@ -1073,7 +1073,7 @@ export default function SnakeGame() {
                 </CardHeader>
                 <CardContent>
                   <Tabs value={selectedMode} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 md:mb-8 bg-muted/50 dark:bg-slate-900/50">
+                    <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 md:mb-8 bg-muted/50 dark:bg-slate-700/30">
                       <TabsTrigger value="classic" onClick={() => setSelectedMode('classic')} className="text-sm md:text-sm py-3">
                         <Gamepad2 className="w-5 h-5 md:w-4 md:h-4 mr-1 md:mr-2" />
                         <span className="hidden sm:inline">Classic</span>
@@ -1094,7 +1094,7 @@ export default function SnakeGame() {
 
                     <TabsContent value="classic" className="space-y-6">
                       {/* Level Selection */}
-                      <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+                      <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                         <CardHeader>
                           <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 flex items-center gap-2">
                             <Target className="w-5 h-5 text-green-400" />
@@ -1110,7 +1110,7 @@ export default function SnakeGame() {
                                 className={`cursor-pointer transition-all hover:scale-105 ${
                                   selectedLevel === level.id
                                     ? 'ring-2 ring-green-500/50 shadow-xl shadow-green-500/20 bg-green-500/10 dark:bg-green-500/20 hover:scale-105'
-                                    : 'bg-muted/50 dark:bg-slate-900/50 hover:bg-muted/80 dark:hover:bg-slate-800/50'
+                                    : 'bg-muted/50 dark:bg-slate-700/30 hover:bg-muted/80 dark:hover:bg-slate-800/50'
                                 }`}
                               >
                                 <CardContent className="p-4">
@@ -1177,7 +1177,7 @@ export default function SnakeGame() {
 
                     <TabsContent value="pvp" className="space-y-6">
                       {/* PvP Level Selection */}
-                      <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+                      <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                         <CardHeader>
                           <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 flex items-center gap-2">
                             <Target className="w-5 h-5 text-red-400" />
@@ -1193,7 +1193,7 @@ export default function SnakeGame() {
                                 className={`cursor-pointer transition-all hover:scale-105 ${
                                   selectedLevel === level.id
                                     ? 'ring-2 ring-red-500/50 shadow-xl shadow-red-500/20 bg-red-500/10 dark:bg-red-500/20 hover:scale-105'
-                                    : 'bg-muted/50 dark:bg-slate-900/50 hover:bg-muted/80 dark:hover:bg-slate-800/50'
+                                    : 'bg-muted/50 dark:bg-slate-700/30 hover:bg-muted/80 dark:hover:bg-slate-800/50'
                                 }`}
                               >
                                 <CardContent className="p-4">
@@ -1274,7 +1274,7 @@ export default function SnakeGame() {
 
                     <TabsContent value="battle-royale" className="space-y-6">
                       {/* Battle Royale Level Selection */}
-                      <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+                      <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                         <CardHeader>
                           <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 flex items-center gap-2">
                             <Target className="w-5 h-5 text-orange-400" />
@@ -1290,7 +1290,7 @@ export default function SnakeGame() {
                                 className={`cursor-pointer transition-all hover:scale-105 ${
                                   selectedLevel === level.id
                                     ? 'ring-2 ring-orange-500 bg-orange-500/20'
-                                    : 'bg-muted/50 dark:bg-slate-900/50 hover:bg-muted/80 dark:hover:bg-slate-800/50'
+                                    : 'bg-muted/50 dark:bg-slate-700/30 hover:bg-muted/80 dark:hover:bg-slate-800/50'
                                 }`}
                               >
                                 <CardContent className="p-4">
@@ -1374,7 +1374,7 @@ export default function SnakeGame() {
 
                     <TabsContent value="cooperative" className="space-y-6">
                       {/* Co-op Level Selection */}
-                      <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+                      <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                         <CardHeader>
                           <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 flex items-center gap-2">
                             <Target className="w-5 h-5 text-emerald-400" />
@@ -1390,7 +1390,7 @@ export default function SnakeGame() {
                                 className={`cursor-pointer transition-all hover:scale-105 ${
                                   selectedLevel === level.id
                                     ? 'ring-2 ring-emerald-500 bg-emerald-500/20'
-                                    : 'bg-muted/50 dark:bg-slate-900/50 hover:bg-muted/80 dark:hover:bg-slate-800/50'
+                                    : 'bg-muted/50 dark:bg-slate-700/30 hover:bg-muted/80 dark:hover:bg-slate-800/50'
                                 }`}
                               >
                                 <CardContent className="p-4">
@@ -1479,7 +1479,7 @@ export default function SnakeGame() {
             /* Game Interface */
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-center items-start">
               {/* Game Canvas */}
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50 w-full lg:w-auto">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50 w-full lg:w-auto">
                 <CardHeader className="pb-4 px-4 md:px-6">
                   <div className="flex items-center justify-between">
                     <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-lg md:text-xl">Game Area</CardTitle>
@@ -1695,26 +1695,26 @@ export default function SnakeGame() {
               {/* Side Panel - Hidden on mobile, visible on desktop */}
               <div className="hidden lg:block w-80 space-y-4">
                 {/* Score Card */}
-                <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+                <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                   <CardHeader className="pb-3">
                     <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-lg">Statistics</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground dark:text-slate-400">Score</span>
+                      <span className="text-muted-foreground dark:text-slate-200">Score</span>
                       <span className="text-2xl font-bold text-green-400">{gameState.score}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground dark:text-slate-400">Level</span>
+                      <span className="text-muted-foreground dark:text-slate-200">Level</span>
                       <span className="text-xl font-bold text-purple-400">{gameState.level}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground dark:text-slate-400">Length</span>
+                      <span className="text-muted-foreground dark:text-slate-200">Length</span>
                       <span className="text-lg font-semibold text-blue-400">{gameState.snake.length}</span>
                     </div>
                     <Separator className="bg-slate-700/50" />
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground dark:text-slate-400">Speed</span>
+                      <span className="text-muted-foreground dark:text-slate-200">Speed</span>
                       <Badge variant="outline" className="border-slate-600 text-slate-300">
                         {Math.round(150 / gameState.speed * 100)}%
                       </Badge>
@@ -1723,7 +1723,7 @@ export default function SnakeGame() {
                 </Card>
 
                 {/* Controls Card */}
-                <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+                <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                   <CardHeader className="pb-3">
                     <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-lg">Controls</CardTitle>
                   </CardHeader>
@@ -1737,7 +1737,7 @@ export default function SnakeGame() {
                 </Card>
 
                 {/* Quick Actions */}
-                <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+                <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                   <CardContent className="pt-6 space-y-2">
                     <Button
                       className="w-full"
@@ -1785,7 +1785,7 @@ export default function SnakeGame() {
         <DialogContent className="bg-slate-800 backdrop-blur-xl border-slate-700/50 text-white">
           <DialogHeader>
             <DialogTitle>Settings</DialogTitle>
-            <DialogDescription className="text-muted-foreground dark:text-slate-400">
+            <DialogDescription className="text-muted-foreground dark:text-slate-200">
               Customize your game experience
             </DialogDescription>
           </DialogHeader>
@@ -1837,7 +1837,7 @@ export default function SnakeGame() {
       {showAdmin && <AdminDashboard onClose={() => setShowAdmin(false)} />}
 
       {/* Footer */}
-      <footer className="bg-background/80 dark:bg-slate-900/50 backdrop-blur-lg border-t border-border dark:border-slate-700/50 px-6 py-4 mt-auto">
+      <footer className="bg-background/80 dark:bg-slate-700/30 backdrop-blur-lg border-t border-border dark:border-slate-500/50 px-6 py-4 mt-auto">
         <div className="max-w-7xl mx-auto text-center text-slate-400 text-sm">
           © 2025 Snake Game Ultimate Edition.
         </div>

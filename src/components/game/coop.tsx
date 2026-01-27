@@ -293,7 +293,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
   // Handle keyboard input
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (!isPlaying || !socket.gameState) return
+      if (!isPlaying || !socket.gameState || !socket.gameState.snake) return
 
       const snake = [...socket.gameState.snake]
       const head = { ...snake[0] }
@@ -389,7 +389,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
       alert('Please enter your team name')
       return
     }
-    socket.joinGame(playerName, 'coop')
+    socket.joinGame(playerName, 'cooperative')
     setIsJoined(true)
     setIsInRoom(true)
   }
@@ -411,19 +411,6 @@ export function CoopGame({ onExit }: CoopGameProps) {
     setChatInput('')
   }
 
-  function shadeColor(color: string, percent: number) {
-    const num = parseInt(color.replace('#', ''), 16)
-    const amt = Math.round(2.55 * percent)
-    const R = (num >> 16) + amt
-    const G = (num >> 8 & 0x00FF) + amt
-    const B = (num & 0x0000FF) + amt
-    return '#' + (0x1000000 +
-      (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
-      (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
-      (B < 255 ? (B < 1 ? 0 : B) : 255)
-    ).toString(16).slice(1)
-  }
-
   const allTeamMembers = [localPlayer, ...teamMembers].filter((p): p is Player => p !== null)
   const teamScore = socket.players.reduce((sum: any, p: any) => sum + (p.score || 0), 0)
 
@@ -438,7 +425,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
             </div>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-green-500 to-teal-500 bg-clip-text text-transparent dark:from-green-400 dark:to-teal-400">Co-op Mode</h1>
-              <p className="text-muted-foreground dark:text-slate-400 text-sm">Work together with friends!</p>
+              <p className="text-muted-foreground dark:text-slate-200 text-sm">Work together with friends!</p>
             </div>
           </div>
           {isInRoom ? (
@@ -459,7 +446,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
           <div className="lg:col-span-2">
             {!isInRoom && (
               /* Lobby Screen */
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader className="text-center pb-6">
                   <div className="mx-auto mb-4 w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
                     <Heart className="w-12 h-12 text-white" />
@@ -511,7 +498,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
                         placeholder="Enter your team name"
                         value={teamName}
                         onChange={(e) => setTeamName(e.target.value)}
-                        className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-900/50border-border dark:border-slate-700 text-white text-lg py-3"
+                        className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-600/30border-border dark:border-slate-700 text-white text-lg py-3"
                         maxLength={20}
                       />
                     </div>
@@ -528,7 +515,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
                       value={playerName}
                       onChange={(e) => setPlayerName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-900/50border-border dark:border-slate-700 text-white text-lg py-3"
+                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-600/30border-border dark:border-slate-700 text-white text-lg py-3"
                       maxLength={20}
                     />
                   </div>
@@ -573,7 +560,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
 
             {isInRoom && isWaiting && (
               /* Waiting / Countdown Screen */
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardContent className="py-16 text-center">
                   {countdown !== null ? (
                     <div>
@@ -590,7 +577,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
                       <h2 className="text-3xl font-bold text-white mb-2">
                         Waiting for Team...
                       </h2>
-                      <p className="text-muted-foreground dark:text-slate-400 text-lg">
+                      <p className="text-muted-foreground dark:text-slate-200 text-lg">
                         {allTeamMembers.length} / 4 players joined
                       </p>
                       <div className="mt-4 flex items-center justify-center gap-2">
@@ -605,7 +592,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
 
             {isInRoom && isPlaying && (
               /* Game Screen */
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-foreground dark:text-white">Co-op Arena</CardTitle>
@@ -645,7 +632,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
 
             {isInRoom && gameResult && (
               /* Game Result Screen */
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardContent className="py-16 text-center">
                   <div className="mb-6">
                     {gameResult.completed ? (
@@ -696,7 +683,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
           {/* Side Panel - Team Info */}
           <div className="space-y-6">
             {/* Team Members Card */}
-            <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+            <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Users className="w-5 h-5 text-emerald-400" />
@@ -714,7 +701,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
                         className={`flex items-center gap-3 p-3 rounded-lg ${
                           player.id === socket.playerId
                             ? 'bg-emerald-500/20 border border-emerald-500/30'
-                            : 'bg-muted/50 dark:bg-muted/50 dark:bg-slate-900/50border-border dark:border-slate-700/50'
+                            : 'bg-muted/50 dark:bg-muted/50 dark:bg-slate-600/30border-border dark:border-slate-500/50'
                         }`}
                       >
                         <div
@@ -749,7 +736,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
             </Card>
 
             {/* Team Objectives Card */}
-            <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+            <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Target className="w-5 h-5 text-blue-400" />
@@ -764,7 +751,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
                       className={`p-4 rounded-lg border-2 ${
                         objective.completed
                           ? 'bg-green-500/20 border-green-500/30'
-                          : 'bg-muted/50 dark:bg-muted/50 dark:bg-slate-900/50border-border dark:border-slate-700/50'
+                          : 'bg-muted/50 dark:bg-muted/50 dark:bg-slate-600/30border-border dark:border-slate-500/50'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2 mb-2">
@@ -815,7 +802,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
             </Card>
 
             {/* Team Chat Card */}
-            <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+            <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <MessageSquare className="w-5 h-5 text-purple-400" />
@@ -849,7 +836,7 @@ export function CoopGame({ onExit }: CoopGameProps) {
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
-                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-900/50border-border dark:border-slate-700 text-white"
+                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-600/30border-border dark:border-slate-700 text-white"
                       maxLength={200}
                     />
                     <Button size="icon" onClick={handleSendChat}>

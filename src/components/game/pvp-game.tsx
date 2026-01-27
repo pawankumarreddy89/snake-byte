@@ -228,7 +228,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
             </div>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent dark:from-red-400 dark:to-orange-400">PvP Mode</h1>
-              <p className="text-muted-foreground dark:text-slate-400 text-sm">Real-time multiplayer battle</p>
+              <p className="text-muted-foreground dark:text-slate-200 text-sm">Real-time multiplayer battle</p>
             </div>
           </div>
           {isInRoom ? (
@@ -247,7 +247,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             {!isInRoom && (
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader className="text-center pb-6">
                   <div className="mx-auto mb-4 w-24 h-24 bg-gradient-to-br from-red-500 to-orange-600 rounded-2xl flex items-center justify-center">
                     <Users className="w-12 h-12 text-white" />
@@ -268,7 +268,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
                       value={playerName}
                       onChange={(e) => setPlayerName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-900/50border-border dark:border-slate-700 text-white text-lg py-3"
+                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-600/30border-border dark:border-slate-700 text-white text-lg py-3"
                       maxLength={20}
                     />
                   </div>
@@ -311,7 +311,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
             )}
 
             {isInRoom && isWaiting && (
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardContent className="py-16 text-center">
                   {countdown !== null ? (
                     <div>
@@ -324,7 +324,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
                         <Users className="w-16 h-16 text-purple-400 mx-auto mb-4" />
                       </div>
                       <h2 className="text-3xl font-bold text-white mb-2">Waiting for Opponent...</h2>
-                      <p className="text-muted-foreground dark:text-slate-400 text-lg">You're in the queue</p>
+                      <p className="text-muted-foreground dark:text-slate-200 text-lg">You're in the queue</p>
                       <div className="mt-6 flex items-center justify-center gap-3">
                         <div className="animate-pulse w-3 h-3 bg-green-500 rounded-full" />
                         <span className="text-green-400">Connected to room</span>
@@ -336,7 +336,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
             )}
 
             {isInRoom && isPlaying && (
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-foreground dark:text-white">PvP Battle</CardTitle>
@@ -366,7 +366,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
             )}
 
             {gameResult && (
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardContent className="py-16 text-center">
                   <div className="mb-8">
                     <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
@@ -374,7 +374,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
                   <h2 className="text-3xl font-bold text-white mb-2">
                     {gameResult.winner === localPlayer?.name ? 'You Won!' : 'You Lost!'}
                   </h2>
-                  <p className="text-muted-foreground dark:text-slate-400 text-lg mb-6">
+                  <p className="text-muted-foreground dark:text-slate-200 text-lg mb-6">
                     Winner: {gameResult.winner}
                   </p>
                   <Button
@@ -392,13 +392,13 @@ export function PvPGame({ onExit }: PvPGameProps) {
 
           <div className="space-y-4">
             {isInRoom && (
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader>
                   <CardTitle className="text-white text-lg">Players</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {localPlayer && (
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 dark:bg-slate-900/50rounded-lg">
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 dark:bg-slate-600/30rounded-lg">
                       <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-bold">
                           {localPlayer.name.charAt(0).toUpperCase()}
@@ -411,7 +411,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
                     </div>
                   )}
                   {opponent && (
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 dark:bg-slate-900/50rounded-lg">
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 dark:bg-slate-600/30rounded-lg">
                       <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-bold">
                           {opponent.name.charAt(0).toUpperCase()}
@@ -428,7 +428,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
             )}
 
             {isInRoom && (
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader>
                   <CardTitle className="text-white text-lg flex items-center gap-2">
                     <MessageSquare className="w-4 h-4" />
@@ -458,7 +458,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
-                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-900/50border-border dark:border-slate-700 text-white"
+                      className="bg-muted/50 dark:bg-muted/50 dark:bg-slate-600/30border-border dark:border-slate-700 text-white"
                     />
                     <Button size="icon" onClick={handleSendChat} variant="outline">
                       <MessageSquare className="w-4 h-4" />
@@ -469,7 +469,7 @@ export function PvPGame({ onExit }: PvPGameProps) {
             )}
 
             {isInRoom && localPlayer && (
-              <Card className="bg-muted/50 dark:bg-slate-800/50 backdrop-blur-xl border-border dark:border-slate-700/50">
+              <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader>
                   <CardTitle className="text-white text-lg">Game Stats</CardTitle>
                 </CardHeader>

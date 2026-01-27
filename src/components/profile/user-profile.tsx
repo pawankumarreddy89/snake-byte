@@ -362,95 +362,95 @@ export function UserProfile({ onClose, userId = '1', initialTab = 'overview' }: 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-indigo-100 dark:from-indigo-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-white text-lg">Loading profile...</p>
+          <p className="text-foreground text-lg">Loading profile...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-indigo-100 dark:from-indigo-900 dark:via-purple-900 dark:to-indigo-900 flex flex-col">
       {/* Header */}
-      <header className="bg-slate-901/50 backdrop-blur-lg border-b border-slate-700/50 px-6 py-4">
+      <header className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-lg border-b border-slate-300 dark:border-slate-700/50 px-3 sm:px-6 py-3 sm:py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={onClose} className="text-slate-400 hover:text-white">
-              <Trophy className="w-6 h-6" />
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button variant="ghost" size="icon" onClick={onClose} className="text-slate-600 dark:text-slate-400 hover:text-foreground">
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
             </Button>
-            <h1 className="text-3xl font-bold text-white">Player Profile</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 dark:from-purple-400 via-pink-600 dark:via-pink-400 to-orange-600 dark:to-orange-400 bg-clip-text text-transparent">Player Profile</h1>
           </div>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" size="sm" onClick={onClose} className="hidden sm:inline-flex">
             Close
           </Button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-3 sm:p-6">
         <div className="max-w-7xl mx-auto">
           {/* Stats Overview */}
           {stats && (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-              <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Trophy className="w-4 h-4 text-yellow-400" />
-                    <span className="text-xs text-slate-400">Total Score</span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4 mb-4 sm:mb-6">
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                    <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
+                    <span className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-200">Total Score</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{stats.totalScore.toLocaleString()}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-foreground">{stats.totalScore.toLocaleString()}</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Gamepad2 className="w-4 h-4 text-purple-400" />
-                    <span className="text-xs text-slate-400">Games</span>
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                    <Gamepad2 className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400" />
+                    <span className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-200">Games</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{stats.gamesPlayed}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-foreground">{stats.gamesPlayed}</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="w-4 h-4 text-green-400" />
-                    <span className="text-xs text-slate-400">High Score</span>
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                    <Target className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
+                    <span className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-200">High Score</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{stats.highScore}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-foreground">{stats.highScore}</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Star className="w-4 h-4 text-blue-400" />
-                    <span className="text-xs text-slate-400">Level</span>
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
+                    <span className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-200">Level</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{stats.level}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-foreground">{stats.level}</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="w-4 h-4 text-orange-400" />
-                    <span className="text-xs text-slate-400">Win Rate</span>
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                    <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400" />
+                    <span className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-200">Win Rate</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{stats.winRate}%</p>
+                  <p className="text-lg sm:text-2xl font-bold text-foreground">{stats.winRate}%</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock className="w-4 h-4 text-pink-400" />
-                    <span className="text-xs text-slate-400">Play Time</span>
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400" />
+                    <span className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-200">Play Time</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{formatTime(stats.playTime)}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-foreground">{formatTime(stats.playTime)}</p>
                 </CardContent>
               </Card>
             </div>
@@ -458,80 +458,83 @@ export function UserProfile({ onClose, userId = '1', initialTab = 'overview' }: 
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-slate-900/50">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">
-                <Award className="w-4 h-4 mr-2" />
-                Achievements
+            <TabsList className="grid w-full grid-cols-3 bg-slate-200/50 dark:bg-slate-700/40">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600 text-xs sm:text-sm">
+                <Award className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Achievements</span>
+                <span className="sm:hidden">Awards</span>
               </TabsTrigger>
-              <TabsTrigger value="history" className="data-[state=active]:bg-purple-600">
-                <Calendar className="w-4 h-4 mr-2" />
-                Game History
+              <TabsTrigger value="history" className="data-[state=active]:bg-purple-600 text-xs sm:text-sm">
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Game History</span>
+                <span className="sm:hidden">History</span>
               </TabsTrigger>
-              <TabsTrigger value="battlepass" className="data-[state=active]:bg-purple-600">
-                <Zap className="w-4 h-4 mr-2" />
-                Battle Pass
+              <TabsTrigger value="battlepass" className="data-[state=active]:bg-purple-600 text-xs sm:text-sm">
+                <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Battle Pass</span>
+                <span className="sm:hidden">Pass</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Achievements Tab */}
-            <TabsContent value="overview" className="mt-6">
-              <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Award className="w-5 h-5 text-yellow-400" />
+            <TabsContent value="overview" className="mt-4 sm:mt-6">
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50">
+                <CardHeader className="p-3 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                    <CardTitle className="text-foreground flex items-center gap-2 text-lg sm:text-xl">
+                      <Award className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
                       Achievements
                     </CardTitle>
-                    <Badge variant="outline" className="border-yellow-500/30 text-yellow-400">
+                    <Badge variant="outline" className="border-yellow-500/30 text-yellow-400 text-xs sm:text-sm w-fit">
                       {achievements.filter(a => a.unlocked).length}/{achievements.length} Unlocked
                     </Badge>
                   </div>
-                  <CardDescription className="text-slate-400">
+                  <CardDescription className="text-slate-600 dark:text-slate-200 text-xs sm:text-sm">
                     Complete challenges and reach milestones to unlock rewards!
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[500px] pr-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent className="p-2 sm:p-6">
+                  <ScrollArea className="h-[400px] sm:h-[500px] pr-2 sm:pr-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
                       {achievements.map((achievement) => (
                         <Card
                           key={achievement.id}
                           className={`${
                             achievement.unlocked
                               ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/30'
-                              : 'bg-slate-900/50 border-slate-700/50 opacity-60'
+                              : 'bg-slate-200/50 dark:bg-slate-700/40 border-slate-300 dark:border-slate-700/50 opacity-60'
                           }`}
                         >
-                          <CardContent className="p-4">
-                            <div className="flex items-start gap-4">
+                          <CardContent className="p-2 sm:p-4">
+                            <div className="flex items-start gap-2 sm:gap-4">
                               <div
-                                className={`text-3xl ${
+                                className={`text-2xl sm:text-3xl ${
                                   achievement.unlocked ? '' : 'grayscale'
                                 }`}
                               >
                                 {achievement.icon}
                               </div>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className={`font-semibold ${achievement.unlocked ? 'text-white' : 'text-slate-400'}`}>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                                  <h3 className={`font-semibold text-sm sm:text-base ${achievement.unlocked ? 'text-foreground' : 'text-slate-500 dark:text-slate-400'} truncate`}>
                                     {achievement.name}
                                   </h3>
                                   {achievement.unlocked ? (
-                                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                    <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
                                   ) : (
-                                    <Lock className="w-4 h-4 text-slate-500" />
+                                    <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-500 flex-shrink-0" />
                                   )}
                                 </div>
-                                <p className="text-sm text-slate-400 mb-2">{achievement.description}</p>
+                                <p className="text-[10px] sm:text-sm text-slate-600 dark:text-slate-200 mb-1 sm:mb-2 line-clamp-2">{achievement.description}</p>
 
                                 {achievement.progress > 0 && (
                                   <div className="space-y-1">
                                     <Progress
                                       value={(achievement.progress / achievement.maxProgress) * 100}
-                                      className="h-2"
+                                      className="h-1 sm:h-2"
                                     />
-                                    <div className="flex items-center justify-between text-xs">
-                                      <span className="text-slate-400">
+                                    <div className="flex items-center justify-between text-[10px] sm:text-xs">
+                                      <span className="text-slate-600 dark:text-slate-200">
                                         {achievement.progress} / {achievement.maxProgress}
                                       </span>
                                       {achievement.reward && (
@@ -542,8 +545,8 @@ export function UserProfile({ onClose, userId = '1', initialTab = 'overview' }: 
                                 )}
 
                                 {achievement.unlocked && achievement.unlockedAt && (
-                                  <div className="flex items-center gap-1 text-xs text-slate-500 mt-2">
-                                    <Clock className="w-3 h-3" />
+                                  <div className="flex items-center gap-1 text-[10px] sm:text-xs text-slate-500 mt-1 sm:mt-2">
+                                    <Clock className="w-2 h-2 sm:w-3 sm:h-3" />
                                     <span>Unlocked {formatDate(achievement.unlockedAt)}</span>
                                   </div>
                                 )}
@@ -559,59 +562,60 @@ export function UserProfile({ onClose, userId = '1', initialTab = 'overview' }: 
             </TabsContent>
 
             {/* Game History Tab */}
-            <TabsContent value="history" className="mt-6">
-              <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-blue-400" />
+            <TabsContent value="history" className="mt-4 sm:mt-6">
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50">
+                <CardHeader className="p-3 sm:p-6">
+                  <CardTitle className="text-foreground flex items-center gap-2 text-lg sm:text-xl">
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
                     Game History
                   </CardTitle>
-                  <CardDescription className="text-slate-400">
+                  <CardDescription className="text-slate-600 dark:text-slate-200 text-xs sm:text-sm">
                     Track your recent games and performance
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[500px]">
-                    <div className="space-y-3">
+                <CardContent className="p-2 sm:p-6">
+                  <ScrollArea className="h-[400px] sm:h-[500px]">
+                    <div className="space-y-2 sm:space-y-3">
                       {!Array.isArray(gameHistory) || gameHistory.length === 0 ? (
-                        <div className="text-center py-12 text-slate-400">
-                          <Gamepad2 className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <p>No games played yet</p>
-                          <p className="text-sm mt-2">Start playing to see your game history!</p>
+                        <div className="text-center py-8 sm:py-12 text-slate-400">
+                          <Gamepad2 className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-4 opacity-50" />
+                          <p className="text-sm sm:text-base">No games played yet</p>
+                          <p className="text-xs sm:text-sm mt-2">Start playing to see your game history!</p>
                         </div>
                       ) : (
                         gameHistory.map((game) => (
-                        <Card key={game.id} className="bg-slate-900/50 border-slate-700/50">
-                          <CardContent className="p-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
+                        <Card key={game.id} className="bg-slate-200/50 dark:bg-slate-700/40 border-slate-300 dark:border-slate-700/50">
+                          <CardContent className="p-2 sm:p-4">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                                 <div
-                                  className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
                                     game.result === 'Victory'
                                       ? 'bg-green-500/20'
                                       : 'bg-red-500/20'
                                   }`}
                                 >
                                   {game.result === 'Victory' ? (
-                                    <Trophy className="w-6 h-6 text-green-400" />
+                                    <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
                                   ) : (
-                                    <X className="w-6 h-6 text-red-400" />
+                                    <X className="w-5 h-5 sm:w-6 sm:h-6 text-red-400" />
                                   )}
                                 </div>
-                                <div>
-                                  <h3 className="font-semibold text-white">{game.mode} Mode</h3>
-                                  <div className="flex items-center gap-3 text-sm text-slate-400">
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">{game.mode} Mode</h3>
+                                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-sm text-slate-600 dark:text-slate-200">
                                     <span className="flex items-center gap-1">
-                                      <Target className="w-3 h-3" />
+                                      <Target className="w-2 h-2 sm:w-3 sm:h-3" />
                                       Score: {game.score}
                                     </span>
                                     <span className="flex items-center gap-1">
-                                      <Clock className="w-3 h-3" />
+                                      <Clock className="w-2 h-2 sm:w-3 sm:h-3" />
                                       {formatTime(game.duration)}
                                     </span>
                                     <span className="flex items-center gap-1">
-                                      <Calendar className="w-3 h-3" />
-                                      {formatDate(game.date)}
+                                      <Calendar className="w-2 h-2 sm:w-3 sm:h-3" />
+                                      <span className="hidden sm:inline">{formatDate(game.date)}</span>
+                                      <span className="sm:hidden">{formatDate(game.date).split(' ')[0]}</span>
                                     </span>
                                   </div>
                                 </div>
@@ -638,64 +642,64 @@ export function UserProfile({ onClose, userId = '1', initialTab = 'overview' }: 
             </TabsContent>
 
             {/* Battle Pass Tab */}
-            <TabsContent value="battlepass" className="mt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <TabsContent value="battlepass" className="mt-4 sm:mt-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* Battle Pass Progress */}
-                <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50 lg:col-span-1">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Zap className="w-5 h-5 text-yellow-400" />
+                <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 lg:col-span-1">
+                  <CardHeader className="p-3 sm:p-6">
+                    <CardTitle className="text-foreground flex items-center gap-2 text-lg sm:text-xl">
+                      <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
                       Battle Pass
                     </CardTitle>
-                    <CardDescription className="text-slate-400">
+                    <CardDescription className="text-slate-600 dark:text-slate-200 text-xs sm:text-sm">
                       Level up to unlock exclusive rewards!
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-6">
                     <div className="text-center">
-                      <div className="text-6xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-2">
+                      <div className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-1 sm:mb-2">
                         {battlePassLevel}
                       </div>
-                      <p className="text-slate-400">Current Level</p>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-200">Current Level</p>
                     </div>
 
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-400">XP Progress</span>
-                        <span className="text-white font-medium">
+                      <div className="flex items-center justify-between text-xs sm:text-sm">
+                        <span className="text-slate-600 dark:text-slate-200">XP Progress</span>
+                        <span className="text-foreground font-medium text-xs sm:text-sm">
                           {battlePassXP} / {nextLevelXP} XP
                         </span>
                       </div>
-                      <Progress value={xpProgress} className="h-3" />
+                      <Progress value={xpProgress} className="h-2 sm:h-3" />
                     </div>
 
-                    <Card className="bg-slate-900/50 border-slate-700/50">
-                      <CardContent className="p-4">
-                        <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
-                          <Flame className="w-4 h-4 text-orange-400" />
+                    <Card className="bg-slate-200/50 dark:bg-slate-700/40 border-slate-300 dark:border-slate-700/50">
+                      <CardContent className="p-2 sm:p-4">
+                        <h4 className="font-semibold text-foreground mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+                          <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400" />
                           Daily Challenges
                         </h4>
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           {dailyChallenges.map((challenge) => (
-                            <div key={challenge.id} className="space-y-2">
-                              <div className="flex items-start justify-between gap-2">
-                                <div>
-                                  <p className="text-sm font-medium text-white">{challenge.title}</p>
-                                  <p className="text-xs text-slate-400">{challenge.description}</p>
+                            <div key={challenge.id} className="space-y-1 sm:space-y-2">
+                              <div className="flex items-start justify-between gap-1 sm:gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs sm:text-sm font-medium text-foreground truncate">{challenge.title}</p>
+                                  <p className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-200 line-clamp-1">{challenge.description}</p>
                                 </div>
                                 {challenge.completed ? (
-                                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
                                 ) : (
-                                  <Badge variant="outline" className="text-purple-400 border-purple-500/30 text-xs">
+                                  <Badge variant="outline" className="text-purple-400 border-purple-500/30 text-[10px] sm:text-xs">
                                     {challenge.reward}
                                   </Badge>
                                 )}
                               </div>
                               <Progress
                                 value={(challenge.progress / challenge.target) * 100}
-                                className="h-2"
+                                className="h-1 sm:h-2"
                               />
-                              <div className="flex items-center justify-between text-xs text-slate-400">
+                              <div className="flex items-center justify-between text-[10px] sm:text-xs text-slate-600 dark:text-slate-200">
                                 <span>{challenge.progress} / {challenge.target}</span>
                                 <span className="text-purple-400">+{challenge.xpReward} XP</span>
                               </div>
@@ -708,16 +712,16 @@ export function UserProfile({ onClose, userId = '1', initialTab = 'overview' }: 
                 </Card>
 
                 {/* Battle Pass Levels */}
-                <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50 lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle className="text-white">Rewards Track</CardTitle>
-                    <CardDescription className="text-slate-400">
+                <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 lg:col-span-2">
+                  <CardHeader className="p-3 sm:p-6">
+                    <CardTitle className="text-foreground text-lg sm:text-xl">Rewards Track</CardTitle>
+                    <CardDescription className="text-slate-600 dark:text-slate-200 text-xs sm:text-sm">
                       Unlock rewards as you progress through the battle pass
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[500px]">
-                      <div className="space-y-3">
+                  <CardContent className="p-2 sm:p-6">
+                    <ScrollArea className="h-[400px] sm:h-[500px]">
+                      <div className="space-y-2 sm:space-y-3">
                         {battlePassLevels.map((level, index) => (
                           <Card
                             key={level.level}
@@ -726,38 +730,38 @@ export function UserProfile({ onClose, userId = '1', initialTab = 'overview' }: 
                                 ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/30'
                                 : level.level === battlePassLevel
                                 ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/30'
-                                : 'bg-slate-900/50 border-slate-700/50 opacity-50'
+                                : 'bg-slate-200/50 dark:bg-slate-700/40 border-slate-300 dark:border-slate-700/50 opacity-50'
                             }`}
                           >
-                            <CardContent className="p-4">
-                              <div className="flex items-center gap-4">
+                            <CardContent className="p-2 sm:p-4">
+                              <div className="flex items-start sm:items-center gap-2 sm:gap-4">
                                 <div
-                                  className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl ${
+                                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold text-lg sm:text-xl flex-shrink-0 ${
                                     level.unlocked
                                       ? 'bg-yellow-500 text-white'
                                       : level.level === battlePassLevel
                                       ? 'bg-purple-500 text-white'
-                                      : 'bg-slate-700 text-slate-400'
+                                      : 'bg-slate-300 dark:bg-slate-600 text-slate-600 dark:text-slate-400'
                                   }`}
                                 >
                                   {level.level}
                                 </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="font-semibold text-white">Level {level.level}</h3>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                                    <h3 className="font-semibold text-foreground text-sm sm:text-base">Level {level.level}</h3>
                                     {level.unlocked && (
-                                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                      <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
                                     )}
                                   </div>
-                                  <div className="flex flex-wrap gap-2">
+                                  <div className="flex flex-wrap gap-1 sm:gap-2">
                                     {level.rewards.map((reward, idx) => (
                                       <Badge
                                         key={idx}
                                         variant="outline"
                                         className={
                                           level.unlocked
-                                            ? 'border-yellow-500/30 text-yellow-400'
-                                            : 'border-slate-600 text-slate-400'
+                                            ? 'border-yellow-500/30 text-yellow-400 text-[10px] sm:text-xs'
+                                            : 'border-slate-600 text-slate-400 text-[10px] sm:text-xs'
                                         }
                                       >
                                         {reward}
@@ -765,9 +769,9 @@ export function UserProfile({ onClose, userId = '1', initialTab = 'overview' }: 
                                     ))}
                                   </div>
                                 </div>
-                                <div className="text-right">
-                                  <p className="text-sm text-slate-400">Required XP</p>
-                                  <p className="font-semibold text-white">{level.xpRequired}</p>
+                                <div className="text-right flex-shrink-0">
+                                  <p className="text-[10px] sm:text-sm text-slate-600 dark:text-slate-200">Required XP</p>
+                                  <p className="font-semibold text-foreground text-xs sm:text-base">{level.xpRequired}</p>
                                 </div>
                               </div>
                             </CardContent>
