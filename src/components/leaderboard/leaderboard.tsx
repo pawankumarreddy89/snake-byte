@@ -25,7 +25,7 @@ interface LeaderboardProps {
 }
 
 export function Leaderboard({ userId }: LeaderboardProps) {
-  const [mode, setMode] = useState<'classic' | 'pvp' | 'battle-royale'>('classic')
+  const [mode, setMode] = useState<'classic' | 'pvp' | 'battle-royale' | 'cooperative'>('classic')
   const [period, setPeriod] = useState<'all-time' | 'weekly' | 'daily'>('all-time')
   const [leaderboards, setLeaderboards] = useState<LeaderboardEntry[]>([])
   const [userRank, setUserRank] = useState<number | null>(null)
@@ -80,15 +80,15 @@ export function Leaderboard({ userId }: LeaderboardProps) {
   }
 
   return (
-    <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50 w-full max-w-4xl mx-auto">
+    <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 w-full max-w-4xl mx-auto">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-white flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               <Trophy className="w-5 h-5 text-yellow-400" />
               Leaderboards
             </CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardDescription className="text-slate-600 dark:text-slate-200">
               Compete with players worldwide
             </CardDescription>
           </div>
@@ -102,7 +102,7 @@ export function Leaderboard({ userId }: LeaderboardProps) {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="classic" onValueChange={(v) => setMode(v as any)}>
-          <TabsList className="grid w-full grid-cols-3 mb-6 bg-slate-900/50">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 bg-slate-200/50 dark:bg-slate-700/40">
             <TabsTrigger value="classic">
               <Gamepad2 className="w-4 h-4 mr-2" />
               Classic
@@ -114,6 +114,10 @@ export function Leaderboard({ userId }: LeaderboardProps) {
             <TabsTrigger value="battle-royale">
               <TrendingUp className="w-4 h-4 mr-2" />
               Battle Royale
+            </TabsTrigger>
+            <TabsTrigger value="cooperative">
+              <Users className="w-4 h-4 mr-2" />
+              Co-op
             </TabsTrigger>
           </TabsList>
 
@@ -151,9 +155,9 @@ export function Leaderboard({ userId }: LeaderboardProps) {
 
             {/* Leaderboard List */}
             {loading ? (
-              <div className="text-center py-12 text-slate-400">Loading leaderboards...</div>
+              <div className="text-center py-12 text-slate-600 dark:text-slate-400">Loading leaderboards...</div>
             ) : leaderboards.length === 0 ? (
-              <div className="text-center py-12 text-slate-400">
+              <div className="text-center py-12 text-slate-600 dark:text-slate-400">
                 No entries yet. Be the first to compete!
               </div>
             ) : (
@@ -165,11 +169,11 @@ export function Leaderboard({ userId }: LeaderboardProps) {
                       className={`flex items-center gap-4 p-4 rounded-lg transition-all ${
                         userId === entry.userId
                           ? 'bg-purple-500/10 border border-purple-500/30'
-                          : 'bg-slate-900/50 hover:bg-slate-800/50'
+                          : 'bg-slate-200/50 dark:bg-slate-700/40 hover:bg-slate-300/50 dark:hover:bg-slate-600/40'
                       }`}
                     >
                       {/* Rank */}
-                      <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-slate-800 rounded-lg">
+                      <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-slate-200 dark:bg-slate-800 rounded-lg">
                         {getRankIcon(entry.rank!)}
                       </div>
 
@@ -188,7 +192,7 @@ export function Leaderboard({ userId }: LeaderboardProps) {
                         )}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <p className="font-semibold text-white truncate">{entry.name}</p>
+                            <p className="font-semibold text-foreground truncate">{entry.name}</p>
                             {entry.country && (
                               <span className="text-2xl">{getCountryFlag(entry.country)}</span>
                             )}
@@ -198,14 +202,14 @@ export function Leaderboard({ userId }: LeaderboardProps) {
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm text-slate-400">Level {entry.level}</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">Level {entry.level}</p>
                         </div>
                       </div>
 
                       {/* Score */}
                       <div className="text-right">
                         <p className="text-2xl font-bold text-green-400">{entry.score.toLocaleString()}</p>
-                        <p className="text-xs text-slate-400">points</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">points</p>
                       </div>
                     </div>
                   ))}
