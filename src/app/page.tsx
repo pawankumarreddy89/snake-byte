@@ -1541,6 +1541,11 @@ export default function SnakeGame() {
                       <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400">Length</div>
                       <div className="text-base sm:text-lg font-bold text-blue-400">{gameState.snake.length}</div>
                     </div>
+                    <div className="w-px h-8 sm:h-10 bg-slate-300 dark:bg-slate-700"></div>
+                    <div className="text-center">
+                      <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400">Speed</div>
+                      <div className="text-base sm:text-lg font-bold text-orange-400">{Math.round(150 / gameState.speed * 100)}%</div>
+                    </div>
                     {gameState.isSpecialFood && (
                       <>
                         <div className="w-px h-8 sm:h-10 bg-slate-300 dark:bg-slate-700"></div>
@@ -1793,6 +1798,59 @@ export default function SnakeGame() {
                         </Button>
                       </div>
                     </div>
+
+                    {/* Mobile Controls Info */}
+                    <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-600/50 w-full mt-3">
+                      <CardHeader className="pb-3 px-3 sm:px-4">
+                        <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-sm sm:text-base">Controls</CardTitle>
+                      </CardHeader>
+                      <CardContent className="px-3 sm:px-4 pb-3">
+                        <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 space-y-1">
+                          <p>• Arrow Keys / WASD: Move</p>
+                          <p>• Space: Pause</p>
+                          <p>• Mobile: Use on-screen buttons</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Mobile Action Buttons */}
+                    <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-600/50 w-full mt-2">
+                      <CardContent className="pt-3 pb-3 px-3 sm:px-4 space-y-2">
+                        <Button
+                          className="w-full text-xs sm:text-sm h-8 sm:h-9"
+                          variant="outline"
+                          onClick={pauseGame}
+                        >
+                          {gameState.isPaused ? (
+                            <>
+                              <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              Resume
+                            </>
+                          ) : (
+                            <>
+                              <Pause className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              Pause
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          className="w-full text-xs sm:text-sm h-8 sm:h-9"
+                          variant="outline"
+                          onClick={startGame}
+                        >
+                          <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          Restart
+                        </Button>
+                        <Button
+                          className="w-full text-xs sm:text-sm h-8 sm:h-9"
+                          variant="outline"
+                          onClick={() => setShowMenu(true)}
+                        >
+                          <Menu className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          Main Menu
+                        </Button>
+                      </CardContent>
+                    </Card>
               </div>
 
               {/* Side Panel - Hidden on mobile, visible on desktop */}
