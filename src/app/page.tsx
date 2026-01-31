@@ -1078,7 +1078,7 @@ export default function SnakeGame() {
             <PvPGame onExit={handleExitPvP} />
           ) : showMenu ? (
             /* Main Menu - Mobile First */
-            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-2 sm:px-4">
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-4">
               <Card className="w-full max-w-md bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
                 <CardHeader className="text-center pb-6">
                   <div className="mx-auto mb-4 w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center">
@@ -1205,7 +1205,7 @@ export default function SnakeGame() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
+                          <div className="grid grid-cols-2 gap-3">
                             {getLevelsForMode('pvp').map((level) => (
                               <Card
                                 key={level.id}
@@ -1497,12 +1497,12 @@ export default function SnakeGame() {
             </div>
           ) : (
             /* Game Interface - Mobile First */
-            <div className="flex flex-col gap-2 sm:gap-4 justify-center items-center min-h-screen pb-4 px-2 sm:px-4">
+            <div className="flex flex-col gap-4 justify-center items-center min-h-screen pb-4 px-4">
               {/* Game Canvas */}
               <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 w-full max-w-md">
-                <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-4 md:px-6 py-2 sm:py-4">
+                <CardHeader className="pb-4 px-4 py-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="bg-gradient-to-r from-purple-600 dark:from-purple-400 via-pink-500 dark:via-pink-400 to-orange-500 dark:to-orange-400 bg-clip-text text-transparent text-base sm:text-lg md:text-xl">Game Area</CardTitle>
+                    <CardTitle className="bg-gradient-to-r from-purple-600 dark:from-purple-400 via-pink-500 dark:via-pink-400 to-orange-500 dark:to-orange-400 bg-clip-text text-transparent text-lg">Game Area</CardTitle>
                     <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
@@ -1513,18 +1513,18 @@ export default function SnakeGame() {
                       >
                         {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                       </Button>
-                      <Badge variant="outline" className="border-slate-600 text-slate-300 text-xs md:text-sm">
+                      <Badge variant="outline" className="border-slate-600 text-slate-300 text-sm">
                         {gameState.gameMode}
                       </Badge>
                       {gameState.isPaused && (
-                        <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs md:text-sm">
+                        <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-sm">
                           Paused
                         </Badge>
                       )}
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-2 sm:space-y-4 px-2 sm:px-4 md:px-6 pb-2 sm:pb-6">
+                <CardContent className="space-y-4 px-4 pb-6">
                   {/* Statistics - Always visible (Mobile First) */}
                   <div className="flex flex-wrap justify-around items-center bg-slate-200/50 dark:bg-slate-700/40 rounded-lg p-3 space-x-2 border border-slate-300 dark:border-slate-600">
                     <div className="text-center">

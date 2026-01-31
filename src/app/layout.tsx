@@ -15,25 +15,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Z.ai Code Scaffold - AI-Powered Development",
-  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
-  authors: [{ name: "Z.ai Team" }],
+  title: "Snake Game - Mobile First",
+  description: "Classic Snake game optimized for mobile devices with touch controls",
+  keywords: ["Snake", "Game", "Mobile", "Touch", "React"],
+  authors: [{ name: "Snake Game Team" }],
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
   },
   openGraph: {
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "Snake Game - Mobile First",
+    description: "Classic Snake game optimized for mobile devices",
     url: "https://chat.z.ai",
-    siteName: "Z.ai",
+    siteName: "Snake Game",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "Snake Game - Mobile First",
+    description: "Classic Snake game optimized for mobile devices",
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
