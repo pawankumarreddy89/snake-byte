@@ -971,69 +971,69 @@ export default function SnakeGame() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-100 dark:from-indigo-900 dark:via-purple-900 dark:to-slate-800 flex flex-col">
       {/* Header */}
-      <header className="bg-background/80 dark:bg-slate-700/30 backdrop-blur-lg border-b border-border dark:border-slate-500/50 px-3 md:px-6 py-3 md:py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-1 md:gap-4">
-            <h1 className="text-lg md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent">
+      <header className="bg-background/80 dark:bg-slate-700/30 backdrop-blur-lg border-b border-border dark:border-slate-500/50 px-3 py-3">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent">
               Snake Game
             </h1>
-            <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-400 text-[10px] md:text-xs shadow-lg">
+            <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-400 text-[10px] shadow-lg">
               Ultimate Edition
             </Badge>
           </div>
 
-          <div className="flex items-center gap-1 md:gap-3">
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="default"
-              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
+              className="w-10 h-10 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               title={mounted ? (theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode') : ''}
             >
               {!mounted ? (
-                <div className="w-5 h-5 md:w-5 md:h-5 lg:w-4 lg:h-4" />
+                <div className="w-5 h-5" />
               ) : theme === 'dark' ? (
-                <Sun className="w-5 h-5 md:w-5 md:h-5 lg:w-4 lg:h-4" />
+                <Sun className="w-5 h-5" />
               ) : (
-                <Moon className="w-5 h-5 md:w-5 md:h-5 lg:w-4 lg:h-4" />
+                <Moon className="w-5 h-5" />
               )}
             </Button>
             <Button
               variant="ghost"
               size="default"
-              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
+              className="w-10 h-10 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
               onClick={() => setShowSettings(true)}
               title="Settings"
             >
-              <Settings className="w-5 h-5 md:w-5 md:h-5 lg:w-4 lg:h-4" />
+              <Settings className="w-5 h-5" />
             </Button>
             <Button
               variant="ghost"
               size="default"
-              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
+              className="w-10 h-10 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
               onClick={() => {
                 setProfileActiveTab('overview')
                 setShowProfile(!showProfile)
               }}
               title="Profile"
             >
-              <Award className="w-5 h-5 md:w-5 md:h-5 lg:w-4 lg:h-4" />
+              <Award className="w-5 h-5" />
             </Button>
             <Button
               variant="ghost"
               size="default"
-              className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
+              className="w-10 h-10 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
               onClick={() => setShowAdmin(!showAdmin)}
               title="Admin Dashboard"
             >
-              <Shield className="w-5 h-5 md:w-5 md:h-5 lg:w-4 lg:h-4" />
+              <Shield className="w-5 h-5" />
             </Button>
             {user ? (
-              <div className="flex items-center gap-2 md:gap-3">
+              <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 bg-muted/50 dark:bg-slate-700/40 rounded-lg px-3 py-2">
-                  <span className="text-2xl md:text-xl lg:text-base">{user.avatar || '🎮'}</span>
+                  <span className="text-2xl">{user.avatar || '🎮'}</span>
                   <div className="flex flex-col">
-                    <span className="text-slate-200 font-medium text-sm md:text-base">{user.name}</span>
+                    <span className="text-slate-200 font-medium text-sm">{user.name}</span>
                     {(user as any).isGuest && (
                       <span className="text-xs text-slate-500">Guest</span>
                     )}
@@ -1041,7 +1041,7 @@ export default function SnakeGame() {
                 </div>
                 {(user as any).isGuest ? (
                   <Button
-                    className="bg-purple-600 hover:bg-purple-700 px-4 py-2 text-xs md:text-sm"
+                    className="bg-purple-600 hover:bg-purple-700 px-4 py-2 text-sm"
                     onClick={() => setShowLogin(true)}
                   >
                     Sign Up
@@ -1050,11 +1050,11 @@ export default function SnakeGame() {
                   <Button
                     variant="ghost"
                     size="default"
-                    className="w-10 h-10 md:w-10 md:h-10 lg:w-9 lg:h-9 text-slate-400 hover:text-slate-200"
+                    className="w-10 h-10 text-slate-400 hover:text-slate-200"
                     onClick={handleLogout}
                     title="Logout"
                   >
-                    <LogOut className="w-5 h-5 md:w-5 md:h-5 lg:w-4 lg:h-4" />
+                    <LogOut className="w-5 h-5" />
                   </Button>
                 )}
               </div>
@@ -1064,8 +1064,8 @@ export default function SnakeGame() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto">
+      <main className="flex-1 px-2 py-4">
+        <div className="max-w-md mx-auto">
           {showLeaderboard ? (
             <LeaderboardDisplay onClose={() => setShowLeaderboard(false)} />
           ) : showProfile ? (
@@ -1077,38 +1077,38 @@ export default function SnakeGame() {
           ) : showPvP ? (
             <PvPGame onExit={handleExitPvP} />
           ) : showMenu ? (
-            /* Main Menu */
-            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-4">
-              <Card className="w-full max-w-4xl bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-                <CardHeader className="text-center pb-4 md:pb-8">
-                  <div className="mx-auto mb-4 w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center">
-                    <Gamepad2 className="w-8 h-8 md:w-12 md:h-12 text-white" />
+            /* Main Menu - Mobile First */
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-2 sm:px-4">
+              <Card className="w-full max-w-md bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
+                <CardHeader className="text-center pb-6">
+                  <div className="mx-auto mb-4 w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center">
+                    <Gamepad2 className="w-8 h-8 text-white" />
                   </div>
-                  <CardTitle className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 mb-2">
+                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 mb-2">
                     Snake Game
                   </CardTitle>
-                  <CardDescription className="text-base md:text-lg text-slate-400">
+                  <CardDescription className="text-base text-slate-400">
                     Ultimate Edition
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Tabs value={selectedMode} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 md:mb-8 bg-muted/50 dark:bg-slate-700/30">
-                      <TabsTrigger value="classic" onClick={() => setSelectedMode('classic')} className="text-sm md:text-sm py-3">
-                        <Gamepad2 className="w-5 h-5 md:w-4 md:h-4 mr-1 md:mr-2" />
-                        <span className="hidden sm:inline">Classic</span>
+                    <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted/50 dark:bg-slate-700/30">
+                      <TabsTrigger value="classic" onClick={() => setSelectedMode('classic')} className="text-sm py-3">
+                        <Gamepad2 className="w-4 h-4 mr-2" />
+                        <span>Classic</span>
                       </TabsTrigger>
-                      <TabsTrigger value="pvp" onClick={() => setSelectedMode('pvp')} className="text-sm md:text-sm py-3">
-                        <Users className="w-5 h-5 md:w-4 md:h-4 mr-1 md:mr-2" />
-                        <span className="hidden sm:inline">PvP</span>
+                      <TabsTrigger value="pvp" onClick={() => setSelectedMode('pvp')} className="text-sm py-3">
+                        <Users className="w-4 h-4 mr-2" />
+                        <span>PvP</span>
                       </TabsTrigger>
-                      <TabsTrigger value="battle-royale" onClick={() => setSelectedMode('battle-royale')} className="text-sm md:text-sm py-3">
-                        <TrendingUp className="w-5 h-5 md:w-4 md:h-4 mr-1 md:mr-2" />
-                        <span className="hidden sm:inline">Battle</span>
+                      <TabsTrigger value="battle-royale" onClick={() => setSelectedMode('battle-royale')} className="text-sm py-3">
+                        <TrendingUp className="w-4 h-4 mr-2" />
+                        <span>Battle</span>
                       </TabsTrigger>
-                      <TabsTrigger value="cooperative" onClick={() => setSelectedMode('cooperative')} className="text-sm md:text-sm py-3">
-                        <Zap className="w-5 h-5 md:w-4 md:h-4 mr-1 md:mr-2" />
-                        <span className="hidden sm:inline">Co-op</span>
+                      <TabsTrigger value="cooperative" onClick={() => setSelectedMode('cooperative')} className="text-sm py-3">
+                        <Zap className="w-4 h-4 mr-2" />
+                        <span>Co-op</span>
                       </TabsTrigger>
                     </TabsList>
 
@@ -1122,7 +1122,7 @@ export default function SnakeGame() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
+                          <div className="grid grid-cols-2 gap-3">
                             {getLevelsForMode('classic').map((level) => (
                               <Card
                                 key={level.id}
@@ -1302,7 +1302,7 @@ export default function SnakeGame() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div className="grid grid-cols-2 gap-3">
                             {getLevelsForMode('battle-royale').map((level) => (
                               <Card
                                 key={level.id}
@@ -1402,7 +1402,7 @@ export default function SnakeGame() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3">
+                          <div className="grid grid-cols-2 gap-3">
                             {getLevelsForMode('cooperative').map((level) => (
                               <Card
                                 key={level.id}
@@ -1496,10 +1496,10 @@ export default function SnakeGame() {
               </Card>
             </div>
           ) : (
-            /* Game Interface */
-            <div className="flex flex-col gap-2 sm:gap-4 lg:gap-6 justify-center items-start min-h-screen lg:min-h-0 pb-4">
+            /* Game Interface - Mobile First */
+            <div className="flex flex-col gap-2 sm:gap-4 justify-center items-center min-h-screen pb-4 px-2 sm:px-4">
               {/* Game Canvas */}
-              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 w-full lg:w-auto">
+              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 w-full max-w-md">
                 <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-4 md:px-6 py-2 sm:py-4">
                   <div className="flex items-center justify-between">
                     <CardTitle className="bg-gradient-to-r from-purple-600 dark:from-purple-400 via-pink-500 dark:via-pink-400 to-orange-500 dark:to-orange-400 bg-clip-text text-transparent text-base sm:text-lg md:text-xl">Game Area</CardTitle>
@@ -1525,33 +1525,33 @@ export default function SnakeGame() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2 sm:space-y-4 px-2 sm:px-4 md:px-6 pb-2 sm:pb-6">
-                  {/* Mobile Stats - Visible on mobile and tablet */}
-                  <div className="flex lg:hidden flex-wrap justify-around items-center bg-slate-200/50 dark:bg-slate-700/40 rounded-lg p-2 sm:p-3 space-x-1 sm:space-x-2 border border-slate-300 dark:border-slate-600">
+                  {/* Statistics - Always visible (Mobile First) */}
+                  <div className="flex flex-wrap justify-around items-center bg-slate-200/50 dark:bg-slate-700/40 rounded-lg p-3 space-x-2 border border-slate-300 dark:border-slate-600">
                     <div className="text-center">
-                      <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400">Score</div>
-                      <div className="text-lg sm:text-xl font-bold text-green-400">{gameState.score}</div>
+                      <div className="text-sm font-semibold text-slate-600 dark:text-slate-400">Score</div>
+                      <div className="text-xl font-bold text-green-400">{gameState.score}</div>
                     </div>
-                    <div className="w-px h-8 sm:h-10 bg-slate-300 dark:bg-slate-700"></div>
+                    <div className="w-px h-10 bg-slate-300 dark:bg-slate-700"></div>
                     <div className="text-center">
-                      <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400">Level</div>
-                      <div className="text-base sm:text-lg font-bold text-purple-400">{gameState.level}</div>
+                      <div className="text-sm font-semibold text-slate-600 dark:text-slate-400">Level</div>
+                      <div className="text-xl font-bold text-purple-400">{gameState.level}</div>
                     </div>
-                    <div className="w-px h-8 sm:h-10 bg-slate-300 dark:bg-slate-700"></div>
+                    <div className="w-px h-10 bg-slate-300 dark:bg-slate-700"></div>
                     <div className="text-center">
-                      <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400">Length</div>
-                      <div className="text-base sm:text-lg font-bold text-blue-400">{gameState.snake.length}</div>
+                      <div className="text-sm font-semibold text-slate-600 dark:text-slate-400">Length</div>
+                      <div className="text-xl font-bold text-blue-400">{gameState.snake.length}</div>
                     </div>
-                    <div className="w-px h-8 sm:h-10 bg-slate-300 dark:bg-slate-700"></div>
+                    <div className="w-px h-10 bg-slate-300 dark:bg-slate-700"></div>
                     <div className="text-center">
-                      <div className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400">Speed</div>
-                      <div className="text-base sm:text-lg font-bold text-orange-400">{Math.round(150 / gameState.speed * 100)}%</div>
+                      <div className="text-sm font-semibold text-slate-600 dark:text-slate-400">Speed</div>
+                      <div className="text-xl font-bold text-orange-400">{Math.round(150 / gameState.speed * 100)}%</div>
                     </div>
                     {gameState.isSpecialFood && (
                       <>
-                        <div className="w-px h-8 sm:h-10 bg-slate-300 dark:bg-slate-700"></div>
+                        <div className="w-px h-10 bg-slate-300 dark:bg-slate-700"></div>
                         <div className="text-center">
-                          <div className="text-[10px] sm:text-xs text-yellow-400 font-semibold">⭐ SPECIAL</div>
-                          <div className="text-base sm:text-lg font-bold text-yellow-400">
+                          <div className="text-sm font-semibold text-yellow-400">⭐ SPECIAL</div>
+                          <div className="text-xl font-bold text-yellow-400">
                             {Math.max(0, Math.ceil((gameState.specialFoodEndTime - Date.now()) / 1000))}s
                           </div>
                         </div>
@@ -1565,7 +1565,7 @@ export default function SnakeGame() {
                     <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 rounded-2xl blur opacity-20 dark:opacity-30 animate-pulse"></div>
                     
                     {/* Game Box Frame */}
-                    <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-1 md:p-2 border-2 border-slate-300 dark:border-slate-600 shadow-2xl">
+                    <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-1 border-2 border-slate-300 dark:border-slate-600 shadow-2xl">
                       {/* Corner decorations */}
                       <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-purple-500 rounded-tl-lg"></div>
                       <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-pink-500 rounded-tr-lg"></div>
@@ -1591,57 +1591,57 @@ export default function SnakeGame() {
                             ref={canvasRef}
                             width={gameState.canvasSize}
                             height={gameState.canvasSize}
-                            className="rounded-lg w-full max-w-[95vw] md:max-w-full h-auto touch-none relative z-10"
-                            style={{ maxHeight: '50vh', minHeight: '300px' }}
+                            className="rounded-lg w-full h-auto touch-none relative z-10"
+                            style={{ maxHeight: '45vh', minHeight: '280px' }}
                           />
 
                           {/* Game Over Overlay */}
                           {gameState.isGameOver && (
                             <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-20">
-                              <div className="text-center space-y-4 sm:space-y-6 px-4 py-8">
+                              <div className="text-center space-y-4 px-4 py-8 w-full max-w-sm">
                                 {/* Game Over Badge */}
                                 <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-2 rounded-full shadow-lg shadow-red-500/30">
                                   <Trophy className="w-6 h-6" />
                                   <span className="text-lg font-bold">GAME OVER</span>
                                 </div>
-                                
+
                                 {/* Score Display */}
                                 <div className="space-y-2">
-                                  <p className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                                  <p className="text-4xl font-black bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
                                     {gameState.score}
                                   </p>
                                   <p className="text-slate-400 text-sm uppercase tracking-widest">Final Score</p>
                                 </div>
-                                
+
                                 {/* Stats */}
-                                <div className="flex justify-center gap-6 sm:gap-8">
+                                <div className="flex justify-center gap-8">
                                   <div className="text-center">
-                                    <p className="text-2xl sm:text-3xl font-bold text-purple-400">{gameState.level}</p>
+                                    <p className="text-3xl font-bold text-purple-400">{gameState.level}</p>
                                     <p className="text-xs text-slate-400 uppercase tracking-wider">Level</p>
                                   </div>
                                   <div className="text-center">
-                                    <p className="text-2xl sm:text-3xl font-bold text-blue-400">{gameState.snake.length}</p>
+                                    <p className="text-3xl font-bold text-blue-400">{gameState.snake.length}</p>
                                     <p className="text-xs text-slate-400 uppercase tracking-wider">Length</p>
                                   </div>
                                 </div>
-                                
+
                                 {/* Action Buttons */}
-                                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4">
+                                <div className="flex flex-col gap-3 justify-center pt-4">
                                   <Button
                                     size="lg"
-                                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg px-8 py-6 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-all hover:scale-105"
+                                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-lg px-8 py-6 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-all hover:scale-105"
                                     onClick={startGame}
                                   >
-                                    <Play className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                                    <Play className="w-6 h-6 mr-2" />
                                     Play Again
                                   </Button>
                                   <Button
                                     size="lg"
                                     variant="outline"
-                                    className="border-2 border-slate-600 text-slate-300 hover:bg-slate-800/50 hover:border-slate-500 text-base sm:text-lg px-8 py-6 transition-all hover:scale-105"
+                                    className="border-2 border-slate-600 text-slate-300 hover:bg-slate-800/50 hover:border-slate-500 text-lg px-8 py-6 transition-all hover:scale-105"
                                     onClick={resetGame}
                                   >
-                                    <Menu className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                                    <Menu className="w-6 h-6 mr-2" />
                                     Menu
                                   </Button>
                                 </div>
@@ -1656,8 +1656,8 @@ export default function SnakeGame() {
                                 <div className="w-20 h-20 mx-auto bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg shadow-yellow-500/30 animate-pulse">
                                   <Pause className="w-10 h-10 text-white" />
                                 </div>
-                                <h3 className="text-2xl sm:text-3xl font-bold text-white">PAUSED</h3>
-                                <p className="text-slate-400 text-sm">Click the play button to continue</p>
+                                <h3 className="text-3xl font-bold text-white">PAUSED</h3>
+                                <p className="text-slate-400 text-sm">Tap the play button to continue</p>
                               </div>
                             </div>
                           )}
@@ -1666,11 +1666,11 @@ export default function SnakeGame() {
                           <div className="absolute top-2 left-2 right-2 flex justify-between z-10 pointer-events-none">
                             <div className="bg-black/20 dark:bg-black/30 backdrop-blur-[2px] rounded-lg px-2 py-1 border border-white/5">
                               <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">Score</span>
-                              <p className="text-base sm:text-lg font-bold text-green-400">{gameState.score}</p>
+                              <p className="text-lg font-bold text-green-400">{gameState.score}</p>
                             </div>
                             <div className="bg-black/20 dark:bg-black/30 backdrop-blur-[2px] rounded-lg px-2 py-1 border border-white/5">
                               <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">Level</span>
-                              <p className="text-sm sm:text-base font-bold text-purple-400">{gameState.level}</p>
+                              <p className="text-base font-bold text-purple-400">{gameState.level}</p>
                             </div>
                           </div>
 
@@ -1687,18 +1687,18 @@ export default function SnakeGame() {
                 </CardContent>
               </Card>
 
-              {/* Mobile Controls - Retro D-Pad Style - Visible on mobile and tablet */}
-              <div className="lg:hidden w-full pb-4 pt-2">
-                <div className="flex flex-col items-center space-y-2 sm:space-y-3">
+              {/* Touch Controls - D-Pad Style */}
+              <div className="w-full pb-4 pt-2">
+                <div className="flex flex-col items-center space-y-3">
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Controls</p>
                   {/* D-Pad */}
-                  <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg rounded-2xl p-2 sm:p-4 border-2 border-slate-400 dark:border-slate-600 shadow-2xl">
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
+                  <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg rounded-2xl p-4 border-2 border-slate-400 dark:border-slate-600 shadow-2xl">
+                    <div className="grid grid-cols-3 gap-3">
                           {/* Empty top corners */}
-                          <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
+                          <div className="w-14 h-14"></div>
                           {/* Up Button */}
                           <button
-                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl text-xl sm:text-2xl font-bold transition-all duration-100 active:scale-95 ${
+                            className={`w-14 h-14 rounded-xl text-2xl font-bold transition-all duration-100 active:scale-95 select-none ${
                               gameState.direction === 'up'
                                 ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
                                 : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
@@ -1712,11 +1712,11 @@ export default function SnakeGame() {
                             ▲
                           </button>
                           {/* Empty top right */}
-                          <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
+                          <div className="w-14 h-14"></div>
 
                           {/* Left Button */}
                           <button
-                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg text-xl sm:text-2xl font-bold transition-all duration-100 active:scale-95 ${
+                            className={`w-14 h-14 rounded-lg text-2xl font-bold transition-all duration-100 active:scale-95 select-none ${
                               gameState.direction === 'left'
                                 ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
                                 : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
@@ -1731,7 +1731,7 @@ export default function SnakeGame() {
                           </button>
                           {/* Center - Action Button */}
                           <button
-                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg text-base sm:text-xl font-bold transition-all duration-100 active:scale-95 ${
+                            className={`w-14 h-14 rounded-lg text-xl font-bold transition-all duration-100 active:scale-95 select-none ${
                               gameState.isPaused
                                 ? 'bg-gradient-to-br from-green-600 to-green-800 text-white shadow-lg shadow-green-500/50'
                                 : 'bg-gradient-to-br from-yellow-600 to-yellow-800 text-white shadow-lg shadow-yellow-500/50'
@@ -1742,7 +1742,7 @@ export default function SnakeGame() {
                           </button>
                           {/* Right Button */}
                           <button
-                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg text-xl sm:text-2xl font-bold transition-all duration-100 active:scale-95 ${
+                            className={`w-14 h-14 rounded-lg text-2xl font-bold transition-all duration-100 active:scale-95 select-none ${
                               gameState.direction === 'right'
                                 ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
                                 : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
@@ -1757,10 +1757,10 @@ export default function SnakeGame() {
                           </button>
 
                           {/* Empty bottom left */}
-                          <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
+                          <div className="w-14 h-14"></div>
                           {/* Down Button */}
                           <button
-                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg text-xl sm:text-2xl font-bold transition-all duration-100 active:scale-95 ${
+                            className={`w-14 h-14 rounded-lg text-2xl font-bold transition-all duration-100 active:scale-95 select-none ${
                               gameState.direction === 'down'
                                 ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
                                 : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
@@ -1774,167 +1774,83 @@ export default function SnakeGame() {
                             ▼
                           </button>
                           {/* Empty bottom right */}
-                          <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
+                          <div className="w-14 h-14"></div>
                         </div>
                       </div>
 
                       {/* Action Bar */}
-                      <div className="flex gap-2 sm:gap-3 justify-center">
+                      <div className="flex gap-3 justify-center">
                         <Button
                           variant="outline"
                           size="default"
-                          className="w-10 h-10 sm:w-12 sm:h-12 bg-white/50 dark:bg-slate-800/90 border-slate-400 dark:border-slate-600/60 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 active:bg-slate-200 dark:active:bg-slate-600"
+                          className="w-12 h-12 bg-white/50 dark:bg-slate-800/90 border-slate-400 dark:border-slate-600/60 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 active:bg-slate-200 dark:active:bg-slate-600"
                           onClick={() => setShowMenu(true)}
                         >
-                          <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <Menu className="w-5 h-5" />
                         </Button>
                         <Button
                           variant="outline"
                           size="default"
-                          className="w-10 h-10 sm:w-12 sm:h-12 bg-white/50 dark:bg-slate-800/90 border-red-500/60 dark:border-red-600/60 text-red-500 dark:text-red-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:border-red-500/60 dark:hover:border-red-500/60 active:bg-slate-200 dark:active:bg-slate-600"
+                          className="w-12 h-12 bg-white/50 dark:bg-slate-800/90 border-red-500/60 dark:border-red-600/60 text-red-500 dark:text-red-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:border-red-500/60 dark:hover:border-red-500/60 active:bg-slate-200 dark:active:bg-slate-600"
                           onClick={resetGame}
                         >
-                          <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <RotateCcw className="w-5 h-5" />
                         </Button>
                       </div>
                     </div>
 
-                    {/* Mobile Controls Info */}
+                    {/* Controls Info Card */}
                     <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-600/50 w-full mt-3">
-                      <CardHeader className="pb-3 px-3 sm:px-4">
-                        <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-sm sm:text-base">Controls</CardTitle>
+                      <CardHeader className="pb-3 px-4">
+                        <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-sm">Controls</CardTitle>
                       </CardHeader>
-                      <CardContent className="px-3 sm:px-4 pb-3">
-                        <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 space-y-1">
-                          <p>• Arrow Keys / WASD: Move</p>
-                          <p>• Space: Pause</p>
-                          <p>• Mobile: Use on-screen buttons</p>
+                      <CardContent className="px-4 pb-3">
+                        <div className="text-sm text-slate-500 dark:text-slate-400 space-y-1">
+                          <p>• Tap D-Pad: Move snake</p>
+                          <p>• Center Button: Pause/Resume</p>
+                          <p>• Menu/Restart: Quick actions</p>
                         </div>
                       </CardContent>
                     </Card>
 
-                    {/* Mobile Action Buttons */}
+                    {/* Action Buttons Card */}
                     <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-600/50 w-full mt-2">
-                      <CardContent className="pt-3 pb-3 px-3 sm:px-4 space-y-2">
+                      <CardContent className="pt-3 pb-3 px-4 space-y-2">
                         <Button
-                          className="w-full text-xs sm:text-sm h-8 sm:h-9"
+                          className="w-full text-sm h-10"
                           variant="outline"
                           onClick={pauseGame}
                         >
                           {gameState.isPaused ? (
                             <>
-                              <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              <Play className="w-4 h-4 mr-2" />
                               Resume
                             </>
                           ) : (
                             <>
-                              <Pause className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              <Pause className="w-4 h-4 mr-2" />
                               Pause
                             </>
                           )}
                         </Button>
                         <Button
-                          className="w-full text-xs sm:text-sm h-8 sm:h-9"
+                          className="w-full text-sm h-10"
                           variant="outline"
                           onClick={startGame}
                         >
-                          <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          <RotateCcw className="w-4 h-4 mr-2" />
                           Restart
                         </Button>
                         <Button
-                          className="w-full text-xs sm:text-sm h-8 sm:h-9"
+                          className="w-full text-sm h-10"
                           variant="outline"
                           onClick={() => setShowMenu(true)}
                         >
-                          <Menu className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          <Menu className="w-4 h-4 mr-2" />
                           Main Menu
                         </Button>
                       </CardContent>
                     </Card>
-              </div>
-
-              {/* Side Panel - Hidden on mobile, visible on desktop */}
-              <div className="hidden lg:block w-80 space-y-4">
-                {/* Score Card */}
-                <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-lg">Statistics</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground dark:text-slate-200">Score</span>
-                      <span className="text-2xl font-bold text-green-400">{gameState.score}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground dark:text-slate-200">Level</span>
-                      <span className="text-xl font-bold text-purple-400">{gameState.level}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground dark:text-slate-200">Length</span>
-                      <span className="text-lg font-semibold text-blue-400">{gameState.snake.length}</span>
-                    </div>
-                    <Separator className="bg-slate-700/50" />
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground dark:text-slate-200">Speed</span>
-                      <Badge variant="outline" className="border-slate-600 text-slate-300">
-                        {Math.round(150 / gameState.speed * 100)}%
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Controls Card */}
-                <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-lg">Controls</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="text-sm text-slate-400">
-                      <p>• Arrow Keys / WASD: Move</p>
-                      <p>• Space: Pause</p>
-                      <p>• Mobile: Use on-screen buttons</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Quick Actions */}
-                <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-                  <CardContent className="pt-6 space-y-2">
-                    <Button
-                      className="w-full"
-                      variant="outline"
-                      onClick={pauseGame}
-                    >
-                      {gameState.isPaused ? (
-                        <>
-                          <Play className="w-4 h-4 mr-2" />
-                          Resume
-                        </>
-                      ) : (
-                        <>
-                          <Pause className="w-4 h-4 mr-2" />
-                          Pause
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      className="w-full"
-                      variant="outline"
-                      onClick={startGame}
-                    >
-                      <RotateCcw className="w-4 h-4 mr-2" />
-                      Restart
-                    </Button>
-                    <Button
-                      className="w-full"
-                      variant="outline"
-                      onClick={() => setShowMenu(true)}
-                    >
-                      <Menu className="w-4 h-4 mr-2" />
-                      Main Menu
-                    </Button>
-                  </CardContent>
-                </Card>
               </div>
             </div>
           )}
