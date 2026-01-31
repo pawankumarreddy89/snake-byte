@@ -1,1924 +1,492 @@
 'use client'
-// Snake Game - Main Component
 
 import { useState, useEffect, useRef } from 'react'
-import { useTheme } from 'next-themes'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { Slider } from '@/components/ui/slider'
-import { Separator } from '@/components/ui/separator'
-import { AdminDashboard } from '@/components/admin/admin-dashboard'
-import { PvPGame } from '@/components/game/pvp-game'
-import { BattleRoyale } from '@/components/game/battle-royale'
-import { CoopGame } from '@/components/game/coop'
-import { UserProfile } from '@/components/profile/user-profile'
-import { AuthDialog } from '@/components/auth/auth-dialog'
-import { LEVELS } from '@/lib/levels'
-import { Trophy, Users, Gamepad2, Settings, Play, Pause, RotateCcw, User, LogOut, Menu, X, Zap, TrendingUp, Clock, Shield, MessageSquare, Award, Skull, Heart, Target, Volume2, VolumeX, Moon, Sun } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Trophy, Gamepad2, Settings, Users, Star, ChevronRight, Bell } from 'lucide-react'
+import { Game } from './snake-game'
+import { useTouchGesture } from '@/hooks/mobile'
 
-type Direction = 'up' | 'down' | 'left' | 'right'
-type GameMode = 'classic' | 'pvp' | 'battle-royale' | 'cooperative'
-
-interface Position {
-  x: number
-  y: number
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
 }
 
-interface PowerUp {
-  type: 'normal' | 'double-score' | 'speed-boost' | 'slow-motion'
-  active: boolean
-  endTime: number
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1 },
 }
 
-interface GameState {
-  snake: Position[]
-  food: Position
-  direction: Direction
-  score: number
-  level: number
-  speed: number
-  isGameOver: boolean
-  isPaused: boolean
-  gameMode: GameMode
-  selectedLevel: string
-  gridWidth: number
-  gridHeight: number
-  canvasSize: number
-  foodEaten: number
-  powerUp: PowerUp
-  isSpecialFood: boolean
-  specialFoodEndTime: number
+const selectionPulseVariants = {
+  selected: {
+    boxShadow: [
+      '0 0 0px 8px rgba(76, 175, 80, 0.2)',
+      '0 0 0px 16px rgba(76, 175, 80, 0.1)',
+    ],
+  },
 }
 
-const GRID_SIZE = 20
-const CANVAS_SIZE = 600
-
-// Audio Context singleton
-let audioContext: AudioContext | null = null
-
-// Initialize or get the audio context
-const getAudioContext = (): AudioContext => {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-  }
-
-  // Resume the audio context if it's suspended (required by browsers)
-  if (audioContext.state === 'suspended') {
-    audioContext.resume()
-  }
-
-  return audioContext
+const startButtonVariants = {
+  idle: { scale: 1 },
+  pressed: { scale: 0.95 },
+  idle2: { scale: 1.05 },
 }
 
-// Sound effects using Web Audio API
-const playSound = (type: 'eat' | 'special' | 'powerup' | 'powerdown' | 'gameover') => {
-  try {
-    const ctx = getAudioContext()
-    const oscillator = ctx.createOscillator()
-    const gainNode = ctx.createGain()
-
-    oscillator.connect(gainNode)
-    gainNode.connect(ctx.destination)
-
-    switch (type) {
-      case 'eat':
-        oscillator.frequency.value = 600
-        oscillator.type = 'sine'
-        gainNode.gain.setValueAtTime(0.3, ctx.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1)
-        oscillator.start(ctx.currentTime)
-        oscillator.stop(ctx.currentTime + 0.1)
-        break
-      case 'special':
-        oscillator.frequency.setValueAtTime(523.25, ctx.currentTime)
-        oscillator.frequency.exponentialRampToValueAtTime(1046.5, ctx.currentTime + 0.15)
-        oscillator.type = 'sawtooth'
-        gainNode.gain.setValueAtTime(0.25, ctx.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
-        oscillator.start(ctx.currentTime)
-        oscillator.stop(ctx.currentTime + 0.3)
-        break
-      case 'powerup':
-        oscillator.frequency.setValueAtTime(440, ctx.currentTime)
-        oscillator.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1)
-        oscillator.type = 'square'
-        gainNode.gain.setValueAtTime(0.2, ctx.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
-        oscillator.start(ctx.currentTime)
-        oscillator.stop(ctx.currentTime + 0.3)
-        break
-      case 'powerdown':
-        oscillator.frequency.setValueAtTime(880, ctx.currentTime)
-        oscillator.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.1)
-        oscillator.type = 'square'
-        gainNode.gain.setValueAtTime(0.1, ctx.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2)
-        oscillator.start(ctx.currentTime)
-        oscillator.stop(ctx.currentTime + 0.2)
-        break
-      case 'gameover':
-        oscillator.frequency.setValueAtTime(220, ctx.currentTime)
-        oscillator.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.3)
-        oscillator.type = 'triangle'
-        gainNode.gain.setValueAtTime(0.2, ctx.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4)
-        oscillator.start(ctx.currentTime)
-        oscillator.stop(ctx.currentTime + 0.4)
-        break
-    }
-  } catch (error) {
-    console.error('Error playing sound:', error)
-  }
+export type Level = {
+  id: string
+  name: string
+  icon: string
+  description: string
+  difficulty: 'easy' | 'medium' | 'hard'
+  bestScore: number
+  avgTime: number
+  color: string
+  unlocked: boolean
+  mode: 'classic' | 'box-arena' | 'corridor'
 }
 
-// Leaderboard Display Component
-function LeaderboardDisplay({ onClose }: { onClose: () => void }) {
-  const [leaderboards, setLeaderboards] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [period, setPeriod] = useState('all-time')
-  const [mode, setMode] = useState('classic')
+const levels: Level[] = [
+  {
+    id: 'open-world',
+    name: 'Open World',
+    icon: '🌍',
+    description: 'No boundaries - explore infinite space',
+    difficulty: 'easy',
+    bestScore: 1850,
+    avgTime: 45,
+    color: '#4CAF50',
+    unlocked: true,
+    mode: 'classic',
+  },
+  {
+    id: 'box-arena',
+    name: 'Box Arena',
+    icon: '⬛',
+    description: 'Classic boundaries - test your skills',
+    difficulty: 'easy',
+    bestScore: 1230,
+    avgTime: 38,
+    color: '#FF9800',
+    unlocked: true,
+    mode: 'box-arena',
+  },
+  {
+    id: 'corridor',
+    name: 'Corridor',
+    icon: '📏',
+    description: 'Narrow passages - master precision',
+    difficulty: 'medium',
+    bestScore: 890,
+    avgTime: 52,
+    color: '#FF9800',
+    unlocked: true,
+    mode: 'corridor',
+  },
+]
 
-  useEffect(() => {
-    fetchLeaderboards()
-  }, [period, mode])
+export default function SnakeGamePage() {
+  const [selectedLevel, setSelectedLevel] = useState<Level | null>(levels[0])
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [startButtonPulse, setStartButtonPulse] = useState(false)
+  const gameContainerRef = useRef<HTMLDivElement>(null)
 
-  const fetchLeaderboards = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/leaderboards?mode=${mode}&period=${period}`)
-      const data = await response.json()
-      setLeaderboards(data.leaderboards || [])
-    } catch (error) {
-      console.error('Failed to fetch leaderboards:', error)
-      // Use mock data as fallback
-      setLeaderboards([
-        { id: '1', userId: '3', score: 45680, level: 25, name: 'Snake Master', avatar: '🐍' },
-        { id: '2', userId: '2', score: 28950, level: 18, name: 'Pro Gamer', avatar: '🎮' },
-        { id: '3', userId: '1', score: 15420, level: 12, name: 'Demo Player', avatar: '⭐' }
-      ])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-100 dark:from-indigo-900 dark:via-purple-900 dark:to-slate-800 flex flex-col">
-      {/* Header */}
-      <header className="bg-background/80 dark:bg-slate-700/30 backdrop-blur-lg border-b border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={onClose} className="text-foreground/70 hover:text-foreground dark:text-slate-200 dark:hover:text-white">
-              <Trophy className="w-6 h-6" />
-            </Button>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400">Global Leaderboards</h1>
-          </div>
-          <Button variant="outline" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 p-6">
-        <div className="max-w-4xl mx-auto">
-          {/* Filters */}
-          <Card className="bg-background/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50 mb-6">
-            <CardContent className="pt-6">
-              <div className="flex flex-wrap gap-4 justify-center">
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground dark:text-slate-200">Mode:</span>
-                  <div className="flex gap-2">
-                    <Button
-                      variant={mode === 'classic' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setMode('classic')}
-                    >
-                      Classic
-                    </Button>
-                    <Button
-                      variant={mode === 'pvp' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setMode('pvp')}
-                    >
-                      PvP
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground dark:text-slate-200">Period:</span>
-                  <div className="flex gap-2">
-                    <Button
-                      variant={period === 'all-time' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setPeriod('all-time')}
-                    >
-                      All Time
-                    </Button>
-                    <Button
-                      variant={period === 'weekly' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setPeriod('weekly')}
-                    >
-                      Weekly
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Leaderboard Table */}
-          <Card className="bg-background/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-            <CardHeader>
-              <CardTitle className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-400">Top Players</CardTitle>
-              <CardDescription className="text-muted-foreground dark:text-slate-200">
-                {mode.charAt(0).toUpperCase() + mode.slice(1)} • {period.charAt(0).toUpperCase() + period.slice(1)}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="text-center py-12 text-muted-foreground dark:text-slate-200">Loading...</div>
-              ) : leaderboards.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground dark:text-slate-200">No records found</div>
-              ) : (
-                <div className="space-y-2">
-                  {leaderboards.map((entry, index) => (
-                    <div
-                      key={entry.id}
-                      className="flex items-center justify-between p-4 bg-muted/50 dark:bg-slate-700/30 rounded-lg border border-border dark:border-slate-500/50 hover:bg-muted/80 dark:hover:border-slate-600/50 transition-colors"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                          index === 0 ? 'bg-yellow-500 text-yellow-900' :
-                          index === 1 ? 'bg-gray-300 text-gray-700' :
-                          index === 2 ? 'bg-amber-600 text-amber-100' :
-                          'bg-slate-700 text-slate-300'
-                        }`}>
-                          {index + 1}
-                        </div>
-                        <div className="text-2xl">{entry.avatar || '👤'}</div>
-                        <div>
-                          <div className="font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent dark:from-blue-400 dark:to-cyan-400">{entry.name || 'Anonymous'}</div>
-                          <div className="text-sm text-muted-foreground dark:text-slate-200">Level {entry.level}</div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-green-500 dark:text-green-400">{entry.score.toLocaleString()}</div>
-                        <div className="text-xs text-muted-foreground dark:text-slate-200">points</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
-  )
-}
-
-export default function SnakeGame() {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const gameLoopRef = useRef<number | undefined>(undefined)
-  const [gameState, setGameState] = useState<GameState>({
-    snake: [{ x: 10, y: 10 }],
-    food: { x: 15, y: 15 },
-    direction: 'right',
-    score: 0,
-    level: 1,
-    speed: 150,
-    isGameOver: false,
-    isPaused: false,
-    gameMode: 'classic',
-    selectedLevel: 'classic-1',
-    gridWidth: 20,
-    gridHeight: 20,
-    canvasSize: 600,
-    foodEaten: 0,
-    powerUp: { type: 'normal', active: false, endTime: 0 },
-    isSpecialFood: false,
-    specialFoodEndTime: 0
+  const { canSwipe: canSwipeRef } = useTouchGesture({
+    swipeThreshold: 50,
+    longPressDelay: 500,
   })
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [selectedMode, setSelectedMode] = useState<GameMode>('classic')
-  const [user, setUser] = useState<{ name: string; avatar?: string; id?: string } | null>(null)
-  const [showMenu, setShowMenu] = useState(true)
-  const [showSettings, setShowSettings] = useState(false)
-  const [showLogin, setShowLogin] = useState(false)
-  const [showAdmin, setShowAdmin] = useState(false)
-  const [showPvP, setShowPvP] = useState(false)
-  const [showBattleRoyale, setShowBattleRoyale] = useState(false)
-  const [showCoop, setShowCoop] = useState(false)
-  const [showProfile, setShowProfile] = useState(false)
-  const [showLeaderboard, setShowLeaderboard] = useState(false)
-  const [profileActiveTab, setProfileActiveTab] = useState('overview')
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  const [difficulty, setDifficulty] = useState([1])
-  const [selectedLevel, setSelectedLevel] = useState(LEVELS[0].id)
 
-  // Check for saved user session or create guest user on mount
-  useEffect(() => {
-    const savedUser = localStorage.getItem('snake-game-user')
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
-    } else {
-      // Create a guest user with auto-generated name
-      const existingGuestId = localStorage.getItem('snake-game-guest-id')
-      let guestId: string
-      let guestNumber = 1
-
-      if (existingGuestId) {
-        const parsed = JSON.parse(existingGuestId)
-        guestId = parsed.id
-        guestNumber = parsed.number
-      } else {
-        guestId = Math.random().toString(36).substr(2, 9)
-        localStorage.setItem('snake-game-guest-id', JSON.stringify({ id: guestId, number: guestNumber }))
-      }
-
-      const guestUser = {
-        id: guestId,
-        name: `Player ${guestNumber}`,
-        avatar: '🎮',
-        isGuest: true
-      }
-
-      setUser(guestUser)
-      localStorage.setItem('snake-game-user', JSON.stringify(guestUser))
+  const handleLevelSelect = (level: Level) => {
+    // Haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate(10)
     }
-  }, [])
 
-  // Set mounted state after hydration
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+    setIsAnimating(true)
+    setTimeout(() => {
+      setSelectedLevel(level)
+      setIsAnimating(false)
+    }, 150)
 
-  // Update selected level when mode changes
-  useEffect(() => {
-    const modeLevels = LEVELS.filter(l => l.gameMode === selectedMode)
-    if (modeLevels.length > 0) {
-      setSelectedLevel(modeLevels[0].id)
+    // Update start button text
+    setTimeout(() => {
+      setStartButtonPulse(true)
+    }, 500)
+    setTimeout(() => {
+      setStartButtonPulse(false)
+    }, 1000)
+  }
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy':
+        return 'bg-green-500/10 border-green-500 text-green-50'
+      case 'medium':
+        return 'bg-orange-500/10 border-orange-500 text-orange-50'
+      case 'hard':
+        return 'bg-red-500/10 border-red-500 text-red-50'
+      default:
+        return 'bg-gray-500/10 border-gray-500 text-gray-50'
     }
-  }, [selectedMode])
-
-  const getLevelsForMode = (mode: GameMode) => {
-    return LEVELS.filter(l => l.gameMode === mode)
   }
 
-  const handleExitPvP = () => {
-    setShowPvP(false)
-    setShowMenu(true)
+  const getDifficultyIcon = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy':
+        return '🟢'
+      case 'medium':
+        return '🟠'
+      case 'hard':
+        return '🔴'
+      default:
+        return '⚪'
+    }
   }
 
-  const handleExitBattleRoyale = () => {
-    setShowBattleRoyale(false)
-    setShowMenu(true)
-  }
-
-  const handleExitCoop = () => {
-    setShowCoop(false)
-    setShowMenu(true)
-  }
-
-  const handleLogin = (userData: any) => {
-    setUser(userData)
-    setShowLogin(false)
-  }
-
-  const handleLogout = () => {
-    setUser(null)
-    localStorage.removeItem('snake-game-user')
-    setShowMenu(true)
-  }
-
-  const findValidFoodPosition = (levelId: string, snake: Position[] = [{ x: 0, y: 0 }]): Position => {
-    const level = LEVELS.find(l => l.id === levelId)
-    const gridW = level?.gridWidth || 20
-    const gridH = level?.gridHeight || 20
-    
-    let newFood: Position
-    let attempts = 0
-    const maxAttempts = 1000
-    
-    do {
-      newFood = {
-        x: Math.floor(Math.random() * gridW),
-        y: Math.floor(Math.random() * gridH)
-      }
-      attempts++
+  useEffect(() => {
+    // Keyboard navigation
+    const handleKeyNavigation = (e: KeyboardEvent) => {
+      const currentIndex = levels.findIndex(l => l.id === selectedLevel?.id)
       
-      // Check if position is valid (not on snake and not on obstacles)
-      const onSnake = snake.some(segment => segment.x === newFood.x && segment.y === newFood.y)
-      let onObstacle = false
-      
-      if (level?.walls.obstacles) {
-        for (const obstacle of level.walls.obstacles) {
-          if (newFood.x >= obstacle.x && newFood.x < obstacle.x + obstacle.width &&
-              newFood.y >= obstacle.y && newFood.y < obstacle.y + obstacle.height) {
-            onObstacle = true
-            break
-          }
-        }
-      }
-      
-      if (!onSnake && !onObstacle) {
-        return newFood
-      }
-    } while (attempts < maxAttempts)
-    
-    // Fallback to center if no valid position found
-    return { x: Math.floor(gridW / 2), y: Math.floor(gridH / 2) }
-  }
-
-  const generateFood = (snake: Position[], levelId: string = gameState.selectedLevel): Position => {
-    return findValidFoodPosition(levelId, snake)
-  }
-
-  const gameLoop = () => {
-    setGameState(prev => {
-      const newSnake = [...prev.snake]
-      const head = { ...newSnake[0] }
-
-      switch (prev.direction) {
-        case 'up':
-          head.y -= 1
-          break
-        case 'down':
-          head.y += 1
-          break
-        case 'left':
-          head.x -= 1
-          break
-        case 'right':
-          head.x += 1
-          break
-      }
-
-      // Get level configuration
-      const level = LEVELS.find(l => l.id === prev.selectedLevel)
-
-      // Check boundary collision based on wall type
-      if (level?.walls.type === 'none') {
-        // No walls - wrap around
-        if (head.x < 0) head.x = prev.gridWidth - 1
-        if (head.x >= prev.gridWidth) head.x = 0
-        if (head.y < 0) head.y = prev.gridHeight - 1
-        if (head.y >= prev.gridHeight) head.y = 0
-      } else {
-        // Wall collision - game over
-        if (head.x < 0 || head.x >= prev.gridWidth || head.y < 0 || head.y >= prev.gridHeight) {
-          return { ...prev, isGameOver: true }
-        }
-      }
-
-      // Check self collision
-      if (newSnake.some(segment => segment.x === head.x && segment.y === head.y)) {
-        return { ...prev, isGameOver: true }
-      }
-
-      // Check obstacle collision
-      if (level?.walls.obstacles) {
-        for (const obstacle of level.walls.obstacles) {
-          if (head.x >= obstacle.x && head.x < obstacle.x + obstacle.width &&
-              head.y >= obstacle.y && head.y < obstacle.y + obstacle.height) {
-            return { ...prev, isGameOver: true }
-          }
-        }
-      }
-
-      newSnake.unshift(head)
-
-      // Check food collision
-      if (head.x === prev.food.x && head.y === prev.food.y) {
-        // Calculate points based on food type
-        const points = prev.isSpecialFood ? 25 : 10
-        const newScore = prev.score + (points * prev.level)
-        const newLevel = Math.floor(newScore / 100) + 1
-        const newSpeed = Math.max(50, 150 - (newLevel - 1) * 15)
-        
-        // Increment food eaten count
-        const newFoodEaten = prev.foodEaten + 1
-        
-        // Determine if next food should be special (every 5th food)
-        const shouldSpawnSpecial = newFoodEaten % 5 === 0 && !prev.isSpecialFood
-        const specialFoodDuration = 5000 // 5 seconds for special food
-        
-        // Play appropriate sound
-        if (soundEnabled) {
-          playSound(prev.isSpecialFood ? 'special' : 'eat')
-        }
-
-        return {
-          ...prev,
-          snake: newSnake,
-          food: generateFood(newSnake, prev.selectedLevel),
-          score: newScore,
-          level: newLevel,
-          speed: newSpeed,
-          foodEaten: newFoodEaten,
-          isSpecialFood: shouldSpawnSpecial,
-          specialFoodEndTime: shouldSpawnSpecial ? Date.now() + specialFoodDuration : 0
-        }
-      }
-
-      newSnake.pop()
-
-      return {
-        ...prev,
-        snake: newSnake
-      }
-    })
-  }
-
-  useEffect(() => {
-    if (isPlaying && !gameState.isGameOver && !gameState.isPaused) {
-      gameLoopRef.current = window.setInterval(gameLoop, gameState.speed)
-    } else {
-      clearInterval(gameLoopRef.current)
-    }
-
-    return () => clearInterval(gameLoopRef.current)
-  }, [isPlaying, gameState.isGameOver, gameState.isPaused, gameState.speed])
-
-  // Handle power-up timer
-  useEffect(() => {
-    if (!gameState.powerUp.active) return
-    
-    const checkAndDeactivatePowerUp = () => {
-      const now = Date.now()
-      if (now >= gameState.powerUp.endTime && soundEnabled) {
-        playSound('powerdown')
-        setGameState(prev => ({
-          ...prev,
-          powerUp: { type: 'normal', active: false, endTime: 0 }
-        }))
-      }
-    }
-    
-    const timer = setInterval(checkAndDeactivatePowerUp, 1000)
-    
-    return () => clearInterval(timer)
-  }, [gameState.powerUp.active, gameState.powerUp.endTime])
-
-  // Handle special food timer
-  useEffect(() => {
-    if (!gameState.isSpecialFood) return
-    
-    const checkAndDeactivateSpecialFood = () => {
-      const now = Date.now()
-      if (now >= gameState.specialFoodEndTime) {
-        setGameState(prev => ({
-          ...prev,
-          isSpecialFood: false,
-          specialFoodEndTime: 0
-        }))
-      }
-    }
-    
-    const timer = setInterval(checkAndDeactivateSpecialFood, 100)
-    
-    return () => clearInterval(timer)
-  }, [gameState.isSpecialFood, gameState.specialFoodEndTime])
-
-  // Play game over sound
-  useEffect(() => {
-    if (gameState.isGameOver && soundEnabled) {
-      playSound('gameover')
-    }
-  }, [gameState.isGameOver])
-
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (!isPlaying || gameState.isPaused) return
-
-      switch (e.key) {
-        case 'ArrowUp':
-        case 'w':
-        case 'W':
-          e.preventDefault()
-          if (gameState.direction !== 'down') {
-            setGameState(prev => ({ ...prev, direction: 'up' }))
-          }
-          break
-        case 'ArrowDown':
-        case 's':
-        case 'S':
-          e.preventDefault()
-          if (gameState.direction !== 'up') {
-            setGameState(prev => ({ ...prev, direction: 'down' }))
-          }
-          break
-        case 'ArrowLeft':
-        case 'a':
-        case 'A':
-          e.preventDefault()
-          if (gameState.direction !== 'right') {
-            setGameState(prev => ({ ...prev, direction: 'left' }))
-          }
-          break
-        case 'ArrowRight':
-        case 'd':
-        case 'D':
-          e.preventDefault()
-          if (gameState.direction !== 'left') {
-            setGameState(prev => ({ ...prev, direction: 'right' }))
-          }
-          break
-        case ' ':
-          e.preventDefault()
-          setGameState(prev => ({ ...prev, isPaused: !prev.isPaused }))
-          break
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault()
+        const nextIndex = (currentIndex + 1) % levels.length
+        handleLevelSelect(levels[nextIndex])
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault()
+        const prevIndex = (currentIndex - 1 + levels.length) % levels.length
+        handleLevelSelect(levels[prevIndex])
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        setStartButtonPulse(true)
+        setTimeout(() => {
+          // Start game logic here
+          setStartButtonPulse(false)
+        }, 300)
       }
     }
 
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [isPlaying, gameState.direction, gameState.isPaused])
-
-  // Mobile swipe gesture support
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    let touchStartX = 0
-    let touchStartY = 0
-
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartX = e.touches[0].clientX
-      touchStartY = e.touches[0].clientY
-    }
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (!isPlaying || gameState.isPaused) return
-
-      const touchEndX = e.changedTouches[0].clientX
-      const touchEndY = e.changedTouches[0].clientY
-
-      const deltaX = touchEndX - touchStartX
-      const deltaY = touchEndY - touchStartY
-
-      const minSwipeDistance = 30
-
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal swipe
-        if (Math.abs(deltaX) > minSwipeDistance) {
-          if (deltaX > 0 && gameState.direction !== 'left') {
-            setGameState(prev => ({ ...prev, direction: 'right' }))
-          } else if (deltaX < 0 && gameState.direction !== 'right') {
-            setGameState(prev => ({ ...prev, direction: 'left' }))
-          }
-        }
-      } else {
-        // Vertical swipe
-        if (Math.abs(deltaY) > minSwipeDistance) {
-          if (deltaY > 0 && gameState.direction !== 'up') {
-            setGameState(prev => ({ ...prev, direction: 'down' }))
-          } else if (deltaY < 0 && gameState.direction !== 'down') {
-            setGameState(prev => ({ ...prev, direction: 'up' }))
-          }
-        }
-      }
-    }
-
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: true })
-    canvas.addEventListener('touchend', handleTouchEnd, { passive: true })
+    document.addEventListener('keydown', handleKeyNavigation)
 
     return () => {
-      canvas.removeEventListener('touchstart', handleTouchStart)
-      canvas.removeEventListener('touchend', handleTouchEnd)
+      document.removeEventListener('keydown', handleKeyNavigation)
     }
-  }, [isPlaying, gameState.direction, gameState.isPaused])
-
-  const startGame = () => {
-    console.log('Starting game with level:', selectedLevel)
-    // Initialize audio context on user interaction
-    getAudioContext()
-
-    const level = LEVELS.find(l => l.id === selectedLevel)
-    if (level) {
-      const canvasSize = Math.min(600, Math.max(400, level.gridWidth * 30))
-      const spawnX = level.walls.spawnPosition?.x || Math.floor(level.gridWidth / 2)
-      const spawnY = level.walls.spawnPosition?.y || Math.floor(level.gridHeight / 2)
-      const initialSnake = [{ x: spawnX, y: spawnY }]
-
-      setGameState({
-        snake: initialSnake,
-        food: findValidFoodPosition(selectedLevel, initialSnake),
-        direction: 'right',
-        score: 0,
-        level: 1,
-        speed: 150 - (difficulty[0] - 1) * 15,
-        isGameOver: false,
-        isPaused: false,
-        gameMode: selectedMode,
-        selectedLevel: selectedLevel,
-        gridWidth: level.gridWidth,
-        gridHeight: level.gridHeight,
-        canvasSize: canvasSize,
-        foodEaten: 0,
-        powerUp: { type: 'normal', active: false, endTime: 0 },
-        isSpecialFood: false,
-        specialFoodEndTime: 0
-      })
-    }
-    setIsPlaying(true)
-    setShowMenu(false)
-  }
-
-  const pauseGame = () => {
-    setGameState(prev => ({ ...prev, isPaused: !prev.isPaused }))
-  }
-
-  const resetGame = () => {
-    setGameState({
-      snake: [{ x: 10, y: 10 }],
-      food: { x: 15, y: 15 },
-      direction: 'right',
-      score: 0,
-      level: 1,
-      speed: 150,
-      isGameOver: false,
-      isPaused: false,
-      gameMode: selectedMode,
-      selectedLevel: gameState.selectedLevel,
-      gridWidth: gameState.gridWidth,
-      gridHeight: gameState.gridHeight,
-      canvasSize: gameState.canvasSize,
-      foodEaten: 0,
-      powerUp: { type: 'normal', active: false, endTime: 0 },
-      isSpecialFood: false,
-      specialFoodEndTime: 0
-    })
-    setIsPlaying(false)
-    setShowMenu(true)
-  }
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const level = LEVELS.find(l => l.id === gameState.selectedLevel)
-    const canvasSize = gameState.canvasSize
-    const cellSize = canvasSize / gameState.gridWidth
-
-    // Clear canvas
-    ctx.fillStyle = '#1a1a2e'
-    ctx.fillRect(0, 0, canvasSize, canvasSize)
-
-    // Draw grid
-    ctx.strokeStyle = '#2a2a4e'
-    ctx.lineWidth = 1
-    for (let i = 0; i <= gameState.gridWidth; i++) {
-      ctx.beginPath()
-      ctx.moveTo(i * cellSize, 0)
-      ctx.lineTo(i * cellSize, canvasSize)
-      ctx.stroke()
-    }
-    for (let i = 0; i <= gameState.gridHeight; i++) {
-      ctx.beginPath()
-      ctx.moveTo(0, i * cellSize)
-      ctx.lineTo(canvasSize, i * cellSize)
-      ctx.stroke()
-    }
-
-    // Draw obstacles based on level configuration
-    if (level?.walls.obstacles && level.walls.obstacles.length > 0) {
-      ctx.fillStyle = '#4a4a6e'
-      for (const obstacle of level.walls.obstacles) {
-        ctx.fillRect(
-          obstacle.x * cellSize,
-          obstacle.y * cellSize,
-          obstacle.width * cellSize,
-          obstacle.height * cellSize
-        )
-      }
-    }
-
-    if (level?.walls.enabled && level.walls.type === 'parallel') {
-      ctx.fillStyle = '#4a4a6e'
-      ctx.strokeStyle = '#6a6a8e'
-      ctx.lineWidth = 2
-
-      // Draw vertical walls
-      if (level.walls.vertical) {
-        for (const wall of level.walls.vertical) {
-          ctx.beginPath()
-          ctx.moveTo(wall.x * cellSize, wall.yStart * cellSize)
-          ctx.lineTo(wall.x * cellSize, wall.yEnd * cellSize)
-          ctx.stroke()
-          // Draw wall body
-          ctx.fillRect(
-            wall.x * cellSize - cellSize / 2,
-            wall.yStart * cellSize,
-            cellSize,
-            (wall.yEnd - wall.yStart) * cellSize
-          )
-        }
-      }
-
-      // Draw horizontal walls
-      if (level.walls.horizontal) {
-        for (const wall of level.walls.horizontal) {
-          ctx.beginPath()
-          ctx.moveTo(wall.xStart * cellSize, wall.y * cellSize)
-          ctx.lineTo(wall.xEnd * cellSize, wall.y * cellSize)
-          ctx.stroke()
-          // Draw wall body
-          ctx.fillRect(
-            wall.xStart * cellSize,
-            wall.y * cellSize - cellSize / 2,
-            (wall.xEnd - wall.xStart) * cellSize,
-            cellSize
-          )
-        }
-      }
-    }
-
-    // Draw snake
-    gameState.snake.forEach((segment, index) => {
-      const gradient = ctx.createRadialGradient(
-        segment.x * cellSize + cellSize / 2,
-        segment.y * cellSize + cellSize / 2,
-        0,
-        segment.x * cellSize + cellSize / 2,
-        segment.y * cellSize + cellSize / 2,
-        cellSize / 2
-      )
-
-      if (index === 0) {
-        gradient.addColorStop(0, '#4ade80')
-        gradient.addColorStop(1, '#22c55e')
-      } else {
-        gradient.addColorStop(0, '#86efac')
-        gradient.addColorStop(1, '#4ade80')
-      }
-
-      ctx.fillStyle = gradient
-      ctx.beginPath()
-      const padding = cellSize > 20 ? 2 : 1
-      ctx.roundRect(
-        segment.x * cellSize + padding,
-        segment.y * cellSize + padding,
-        cellSize - padding * 2,
-        cellSize - padding * 2,
-        Math.max(2, cellSize / 6)
-      )
-      ctx.fill()
-
-      // Draw eyes on head
-      if (index === 0 && cellSize >= 15) {
-        ctx.fillStyle = '#fff'
-        const eyeSize = Math.max(2, cellSize / 8)
-        let eye1X, eye1Y, eye2X, eye2Y
-        const centerX = segment.x * cellSize + cellSize / 2
-        const centerY = segment.y * cellSize + cellSize / 2
-        const offset = cellSize / 4
-
-        switch (gameState.direction) {
-          case 'up':
-            eye1X = centerX - offset / 2
-            eye1Y = centerY - offset / 2
-            eye2X = centerX + offset / 2
-            eye2Y = centerY - offset / 2
-            break
-          case 'down':
-            eye1X = centerX - offset / 2
-            eye1Y = centerY + offset / 2
-            eye2X = centerX + offset / 2
-            eye2Y = centerY + offset / 2
-            break
-          case 'left':
-            eye1X = centerX - offset / 2
-            eye1Y = centerY - offset / 2
-            eye2X = centerX - offset / 2
-            eye2Y = centerY + offset / 2
-            break
-          case 'right':
-            eye1X = centerX + offset / 2
-            eye1Y = centerY - offset / 2
-            eye2X = centerX + offset / 2
-            eye2Y = centerY + offset / 2
-            break
-        }
-
-        ctx.beginPath()
-        ctx.arc(eye1X, eye1Y, eyeSize, 0, Math.PI * 2)
-        ctx.arc(eye2X, eye2Y, eyeSize, 0, Math.PI * 2)
-        ctx.fill()
-      }
-    })
-
-    // Draw food with glow effect
-    const foodX = gameState.food.x * cellSize + cellSize / 2
-    const foodY = gameState.food.y * cellSize + cellSize / 2
-
-    // Special food has different appearance
-    if (gameState.isSpecialFood) {
-      // Calculate time remaining for pulsing effect
-      const timeRemaining = gameState.specialFoodEndTime - Date.now()
-      const pulseIntensity = Math.sin(Date.now() / 100) * 0.3 + 0.7
-      
-      // Gold special food with stronger glow
-      ctx.shadowColor = '#fbbf24'
-      ctx.shadowBlur = Math.max(15, cellSize / 1.5)
-
-      const specialFoodGradient = ctx.createRadialGradient(foodX, foodY, 0, foodX, foodY, cellSize / 2 - 2)
-      specialFoodGradient.addColorStop(0, '#fef3c7')
-      specialFoodGradient.addColorStop(0.5, '#fbbf24')
-      specialFoodGradient.addColorStop(1, '#d97706')
-
-      ctx.fillStyle = specialFoodGradient
-      ctx.beginPath()
-      ctx.arc(foodX, foodY, Math.max(3, cellSize / 2 - 2), 0, Math.PI * 2)
-      ctx.fill()
-
-      // Add sparkle effect
-      ctx.fillStyle = `rgba(255, 255, 255, ${pulseIntensity})`
-      ctx.beginPath()
-      ctx.arc(foodX - cellSize / 4, foodY - cellSize / 4, 2, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.beginPath()
-      ctx.arc(foodX + cellSize / 4, foodY + cellSize / 4, 1.5, 0, Math.PI * 2)
-      ctx.fill()
-    } else {
-      // Normal red food
-      ctx.shadowColor = '#ef4444'
-      ctx.shadowBlur = Math.max(10, cellSize / 2)
-
-      const foodGradient = ctx.createRadialGradient(foodX, foodY, 0, foodX, foodY, cellSize / 2 - 2)
-      foodGradient.addColorStop(0, '#f87171')
-      foodGradient.addColorStop(1, '#dc2626')
-
-      ctx.fillStyle = foodGradient
-      ctx.beginPath()
-      ctx.arc(foodX, foodY, Math.max(3, cellSize / 2 - 2), 0, Math.PI * 2)
-      ctx.fill()
-    }
-
-    ctx.shadowBlur = 0
-
-  }, [gameState])
+  }, [selectedLevel])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-100 dark:from-indigo-900 dark:via-purple-900 dark:to-slate-800 flex flex-col">
-      {/* Header */}
-      <header className="bg-background/80 dark:bg-slate-700/30 backdrop-blur-lg border-b border-border dark:border-slate-500/50 px-3 py-3">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent">
-              Snake Game
-            </h1>
-            <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-400 text-[10px] shadow-lg">
-              Ultimate Edition
-            </Badge>
-          </div>
+    <div className="min-h-screen bg-[#0A0D1B] overflow-hidden relative" style={{ WebkitTapHighlightColor: 'transparent' }}>
+      {/* Animated Background Pattern */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          className="w-[200%] h-[200%]"
+          animate={{
+            rotate: [0, 360],
+            transition: { duration: 60, repeat: Infinity, ease: 'linear' },
+          }}
+          style={{
+            opacity: 0.03,
+            background: 'repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(76, 175, 80, 0.1) 50px, transparent)',
+            backgroundSize: '40px 40px',
+          }}
+        />
+      </div>
 
-          <div className="flex items-center gap-1">
+      {/* Header Section */}
+      <header className="relative z-20 pt-4 pb-3">
+        <div className="flex items-center justify-between px-4">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <motion.div
+                animate={{ rotate: [0, 360], transition: { duration: 3, repeat: Infinity, ease: 'linear' } }}
+              >
+                <div className="text-5xl animate-pulse2">🐍</div>
+              </motion.div>
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full blur-md"></div>
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-lg">
+                Snake Ultimate
+              </h1>
+              <p className="text-white/80 text-sm font-medium">
+                {selectedLevel?.difficulty === 'hard' ? '🔴' : '🟢'} {selectedLevel?.name}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
-              size="default"
-              className="w-10 h-10 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              title={mounted ? (theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode') : ''}
+              size="icon"
+              className="text-white hover:bg-white/10"
             >
-              {!mounted ? (
-                <div className="w-5 h-5" />
-              ) : theme === 'dark' ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
+              <Settings className="w-6 h-6" />
             </Button>
             <Button
               variant="ghost"
-              size="default"
-              className="w-10 h-10 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
-              onClick={() => setShowSettings(true)}
-              title="Settings"
+              size="icon"
+              className="text-white hover:bg-white/10"
             >
-              <Settings className="w-5 h-5" />
+              <Trophy className="w-6 h-6" />
             </Button>
-            <Button
-              variant="ghost"
-              size="default"
-              className="w-10 h-10 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
-              onClick={() => {
-                setProfileActiveTab('overview')
-                setShowProfile(!showProfile)
-              }}
-              title="Profile"
-            >
-              <Award className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="default"
-              className="w-10 h-10 text-muted-foreground hover:text-purple-500 dark:text-slate-200 dark:hover:text-purple-400"
-              onClick={() => setShowAdmin(!showAdmin)}
-              title="Admin Dashboard"
-            >
-              <Shield className="w-5 h-5" />
-            </Button>
-            {user ? (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 bg-muted/50 dark:bg-slate-700/40 rounded-lg px-3 py-2">
-                  <span className="text-2xl">{user.avatar || '🎮'}</span>
-                  <div className="flex flex-col">
-                    <span className="text-slate-200 font-medium text-sm">{user.name}</span>
-                    {(user as any).isGuest && (
-                      <span className="text-xs text-slate-500">Guest</span>
-                    )}
-                  </div>
-                </div>
-                {(user as any).isGuest ? (
-                  <Button
-                    className="bg-purple-600 hover:bg-purple-700 px-4 py-2 text-sm"
-                    onClick={() => setShowLogin(true)}
-                  >
-                    Sign Up
-                  </Button>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    size="default"
-                    className="w-10 h-10 text-slate-400 hover:text-slate-200"
-                    onClick={handleLogout}
-                    title="Logout"
-                  >
-                    <LogOut className="w-5 h-5" />
-                  </Button>
-                )}
-              </div>
-            ) : null}
+          </div>
+        </div>
+
+        {/* Score Badge */}
+        <div className="absolute right-4 top-4">
+          <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 px-4 py-2 rounded-full shadow-lg">
+            <Trophy className="w-5 h-5 text-yellow-200" />
+            <span className="text-white font-bold text-sm">
+              {selectedLevel?.bestScore.toLocaleString()}
+            </span>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 px-2 py-4">
-        <div className="max-w-md mx-auto">
-          {showLeaderboard ? (
-            <LeaderboardDisplay onClose={() => setShowLeaderboard(false)} />
-          ) : showProfile ? (
-            <UserProfile onClose={() => setShowProfile(false)} initialTab={profileActiveTab} />
-          ) : showCoop ? (
-            <CoopGame onExit={handleExitCoop} />
-          ) : showBattleRoyale ? (
-            <BattleRoyale onExit={handleExitBattleRoyale} />
-          ) : showPvP ? (
-            <PvPGame onExit={handleExitPvP} />
-          ) : showMenu ? (
-            /* Main Menu - Mobile First */
-            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-4">
-              <Card className="w-full max-w-md bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-                <CardHeader className="text-center pb-6">
-                  <div className="mx-auto mb-4 w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center">
-                    <Gamepad2 className="w-8 h-8 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 mb-2">
-                    Snake Game
-                  </CardTitle>
-                  <CardDescription className="text-base text-slate-400">
-                    Ultimate Edition
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Tabs value={selectedMode} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted/50 dark:bg-slate-700/30">
-                      <TabsTrigger value="classic" onClick={() => setSelectedMode('classic')} className="text-sm py-3">
-                        <Gamepad2 className="w-4 h-4 mr-2" />
-                        <span>Classic</span>
-                      </TabsTrigger>
-                      <TabsTrigger value="pvp" onClick={() => setSelectedMode('pvp')} className="text-sm py-3">
-                        <Users className="w-4 h-4 mr-2" />
-                        <span>PvP</span>
-                      </TabsTrigger>
-                      <TabsTrigger value="battle-royale" onClick={() => setSelectedMode('battle-royale')} className="text-sm py-3">
-                        <TrendingUp className="w-4 h-4 mr-2" />
-                        <span>Battle</span>
-                      </TabsTrigger>
-                      <TabsTrigger value="cooperative" onClick={() => setSelectedMode('cooperative')} className="text-sm py-3">
-                        <Zap className="w-4 h-4 mr-2" />
-                        <span>Co-op</span>
-                      </TabsTrigger>
-                    </TabsList>
+      {/* Level Selection */}
+      <main className="flex-1 overflow-y-auto pb-32">
+        <div className="max-w-md mx-auto px-4 pt-6">
+          {/* Difficulty Filter */}
+          <div className="flex items-center gap-3 mb-6">
+            <Button
+              variant={selectedLevel?.difficulty === 'easy' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                const easyLevel = levels.find(l => l.difficulty === 'easy')
+                if (easyLevel) handleLevelSelect(easyLevel)
+              }}
+              className={getDifficultyColor('easy')}
+            >
+              <span className="flex items-center gap-1.5">
+                <span className="text-lg">{getDifficultyIcon('easy')}</span>
+                Easy
+              </span>
+            </Button>
+            <Button
+              variant={selectedLevel?.difficulty === 'medium' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                const mediumLevel = levels.find(l => l.difficulty === 'medium')
+                if (mediumLevel) handleLevelSelect(mediumLevel)
+              }}
+              className={getDifficultyColor('medium')}
+            >
+              <span className="flex items-center gap-1.5">
+                <span className="text-lg">{getDifficultyIcon('medium')}</span>
+                Medium
+              </span>
+            </Button>
+            <Button
+              variant={selectedLevel?.difficulty === 'hard' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                const hardLevel = levels.find(l => l.difficulty === 'hard')
+                if (hardLevel) handleLevelSelect(hardLevel)
+              }}
+              className={getDifficultyColor('hard')}
+            >
+              <span className="flex items-center gap-1.5">
+                <span className="text-lg">{getDifficultyIcon('hard')}</span>
+                Hard
+              </span>
+            </Button>
+          </div>
 
-                    <TabsContent value="classic" className="space-y-6">
-                      {/* Level Selection */}
-                      <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-                        <CardHeader>
-                          <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 flex items-center gap-2">
-                            <Target className="w-5 h-5 text-green-400" />
-                            Select Level
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-2 gap-3">
-                            {getLevelsForMode('classic').map((level) => (
-                              <Card
-                                key={level.id}
-                                onClick={() => setSelectedLevel(level.id)}
-                                className={`cursor-pointer transition-all hover:scale-105 ${
-                                  selectedLevel === level.id
-                                    ? 'ring-2 ring-green-500/50 shadow-xl shadow-green-500/20 bg-green-500/10 dark:bg-green-500/20 hover:scale-105'
-                                    : 'bg-muted/50 dark:bg-slate-700/30 hover:bg-muted/80 dark:hover:bg-slate-800/50'
-                                }`}
-                              >
-                                <CardContent className="p-4">
-                                  <div className="text-center">
-                                    <h4 className={`text-lg font-bold mb-1 ${
-                                      level.difficulty === 'easy' ? 'text-green-400' :
-                                      level.difficulty === 'medium' ? 'text-yellow-400' :
-                                      level.difficulty === 'hard' ? 'text-orange-400' :
-                                      'text-red-400'
-                                    }`}>
-                                      {level.name}
-                                    </h4>
-                                    <Badge
-                                      variant="outline"
-                                      className={`border-2 ${
-                                        level.difficulty === 'easy' ? 'border-green-500/50 text-green-500 dark:text-green-400' :
-                                        level.difficulty === 'medium' ? 'border-yellow-500/30 text-yellow-400' :
-                                        level.difficulty === 'hard' ? 'border-orange-500/30 text-orange-400' :
-                                        'border-red-500/30 text-red-400'
-                                      }`}
-                                    >
-                                      {level.difficulty.toUpperCase()}
-                                    </Badge>
-                                  </div>
-                                  <div className="flex items-center justify-between text-xs text-slate-400">
-                                    <span>{level.description}</span>
-                                    {selectedLevel === level.id && (
-                                      <Badge className="bg-green-500 text-white">
-                                        Selected
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
+          {/* Level Cards */}
+          <div className="space-y-4">
+            {levels.map((level) => {
+              const isSelected = selectedLevel?.id === level.id
+              const isUnlocked = level.unlocked
 
-                      <div className="text-center space-y-4">
-                        <p className="text-foreground/90 dark:text-slate-200 text-lg">
-                          The classic snake game experience. Collect food, grow longer, and try to beat your high score!
-                        </p>
-                        <div className="flex flex-wrap justify-center gap-3">
-                          <Button
-                            variant="outline"
-                            className="border-green-500/50 text-green-500 dark:text-green-400 hover:bg-gradient-to-r hover:from-green-500 hover:to-emerald-500"
-                            onClick={() => setShowLeaderboard(true)}
-                          >
-                            <Trophy className="w-4 h-4 mr-2" />
-                            Leaderboards
-                          </Button>
-                        </div>
-                        <Button
-                          size="lg"
-                          className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-12 py-6 text-xl"
-                          onClick={startGame}
-                        >
-                          <Play className="w-6 h-6 mr-3" />
-                          Start Game
-                        </Button>
-                      </div>
-                    </TabsContent>
-
-                    <TabsContent value="pvp" className="space-y-6">
-                      {/* PvP Level Selection */}
-                      <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-                        <CardHeader>
-                          <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 flex items-center gap-2">
-                            <Target className="w-5 h-5 text-red-400" />
-                            Select Arena
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-2 gap-3">
-                            {getLevelsForMode('pvp').map((level) => (
-                              <Card
-                                key={level.id}
-                                onClick={() => setSelectedLevel(level.id)}
-                                className={`cursor-pointer transition-all hover:scale-105 ${
-                                  selectedLevel === level.id
-                                    ? 'ring-2 ring-red-500/50 shadow-xl shadow-red-500/20 bg-red-500/10 dark:bg-red-500/20 hover:scale-105'
-                                    : 'bg-muted/50 dark:bg-slate-700/30 hover:bg-muted/80 dark:hover:bg-slate-800/50'
-                                }`}
-                              >
-                                <CardContent className="p-4">
-                                  <div className="text-center">
-                                    <h4 className={`text-lg font-bold mb-1 ${
-                                      level.difficulty === 'easy' ? 'text-green-400' :
-                                      level.difficulty === 'medium' ? 'text-yellow-400' :
-                                      level.difficulty === 'hard' ? 'text-orange-400' :
-                                      'text-red-400'
-                                    }`}>
-                                      {level.name}
-                                    </h4>
-                                    <Badge
-                                      variant="outline"
-                                      className={`border-2 ${
-                                        level.difficulty === 'easy' ? 'border-green-500/50 text-green-500 dark:text-green-400' :
-                                        level.difficulty === 'medium' ? 'border-yellow-500/30 text-yellow-400' :
-                                        level.difficulty === 'hard' ? 'border-orange-500/30 text-orange-400' :
-                                        'border-red-500/30 text-red-400'
-                                      }`}
-                                    >
-                                      {level.difficulty.toUpperCase()}
-                                    </Badge>
-                                  </div>
-                                  <div className="flex items-center justify-between text-xs text-slate-400 mt-2">
-                                    <span>{level.description}</span>
-                                    {selectedLevel === level.id && (
-                                      <Badge className="bg-red-500 text-white">
-                                        Selected
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <div className="text-center space-y-4">
-                        <p className="text-foreground/90 dark:text-slate-200 text-lg">
-                          Compete against other players in real-time! Two snakes, one arena - only one wins!
-                        </p>
-                        <div className="flex justify-center gap-4">
-                          <Badge variant="outline" className="border-red-500/30 text-red-400">
-                            <Gamepad2 className="w-3 h-3 mr-1" />
-                            Real-time Multiplayer
-                          </Badge>
-                          <Badge variant="outline" className="border-purple-500/30 text-purple-400">
-                            <Users className="w-3 h-3 mr-1" />
-                            Live Matching
-                          </Badge>
-                          <Badge variant="outline" className="border-blue-500/30 text-blue-400">
-                            <MessageSquare className="w-3 h-3 mr-1" />
-                            In-Game Chat
-                          </Badge>
-                        </div>
-                        <div className="flex flex-wrap justify-center gap-3">
-                          <Button
-                            variant="outline"
-                            className="border-green-500/50 text-green-500 dark:text-green-400 hover:bg-gradient-to-r hover:from-green-500 hover:to-emerald-500"
-                            onClick={() => setShowLeaderboard(true)}
-                          >
-                            <Trophy className="w-4 h-4 mr-2" />
-                            Leaderboards
-                          </Button>
-                        </div>
-                        <Button
-                          size="lg"
-                          className="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white px-12 py-6 text-xl"
-                          onClick={startGame}
-                        >
-                          <Play className="w-6 h-6 mr-3" />
-                          Start PvP Match
-                        </Button>
-                      </div>
-                    </TabsContent>
-
-                    <TabsContent value="battle-royale" className="space-y-6">
-                      {/* Battle Royale Level Selection */}
-                      <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-                        <CardHeader>
-                          <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 flex items-center gap-2">
-                            <Target className="w-5 h-5 text-orange-400" />
-                            Select Battle Zone
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-2 gap-3">
-                            {getLevelsForMode('battle-royale').map((level) => (
-                              <Card
-                                key={level.id}
-                                onClick={() => setSelectedLevel(level.id)}
-                                className={`cursor-pointer transition-all hover:scale-105 ${
-                                  selectedLevel === level.id
-                                    ? 'ring-2 ring-orange-500 bg-orange-500/20'
-                                    : 'bg-muted/50 dark:bg-slate-700/30 hover:bg-muted/80 dark:hover:bg-slate-800/50'
-                                }`}
-                              >
-                                <CardContent className="p-4">
-                                  <div className="text-center">
-                                    <h4 className={`text-lg font-bold mb-1 ${
-                                      level.difficulty === 'easy' ? 'text-green-400' :
-                                      level.difficulty === 'medium' ? 'text-yellow-400' :
-                                      level.difficulty === 'hard' ? 'text-orange-400' :
-                                      'text-red-400'
-                                    }`}>
-                                      {level.name}
-                                    </h4>
-                                    <Badge
-                                      variant="outline"
-                                      className={`border-2 ${
-                                        level.difficulty === 'easy' ? 'border-green-500/50 text-green-500 dark:text-green-400' :
-                                        level.difficulty === 'medium' ? 'border-yellow-500/30 text-yellow-400' :
-                                        level.difficulty === 'hard' ? 'border-orange-500/30 text-orange-400' :
-                                        'border-red-500/30 text-red-400'
-                                      }`}
-                                    >
-                                      {level.difficulty.toUpperCase()}
-                                    </Badge>
-                                  </div>
-                                  <div className="flex items-center justify-between text-xs text-slate-400 mt-2">
-                                    <span>{level.description}</span>
-                                    {selectedLevel === level.id && (
-                                      <Badge className="bg-orange-500 text-white">
-                                        Selected
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <div className="text-center space-y-4">
-                        <p className="text-foreground/90 dark:text-slate-200 text-lg">
-                          Last snake standing! Battle against multiple players in a shrinking arena.
-                        </p>
-                        <div className="flex justify-center gap-4">
-                          <Badge variant="outline" className="border-red-500/50 text-red-500 bg-red-500/10 dark:bg-red-500/20 shadow-lg">
-                            <Skull className="w-3 h-3 mr-1" />
-                            Battle Royale
-                          </Badge>
-                          <Badge variant="outline" className="border-orange-500/50 text-orange-500 bg-orange-500/10 dark:bg-orange-500/20 shadow-lg">
-                            <Zap className="w-3 h-3 mr-1" />
-                            Power-ups
-                          </Badge>
-                          <Badge variant="outline" className="border-purple-500/50 text-purple-500 bg-purple-500/10 dark:bg-purple-500/20 shadow-lg">
-                            <Users className="w-3 h-3 mr-1" />
-                            8 Players
-                          </Badge>
-                        </div>
-                        <div className="flex flex-wrap justify-center gap-3">
-                          <Button
-                            variant="outline"
-                            className="border-green-500/50 text-green-500 dark:text-green-400 hover:bg-gradient-to-r hover:from-green-500 hover:to-emerald-500"
-                            onClick={() => setShowLeaderboard(true)}
-                          >
-                            <Trophy className="w-4 h-4 mr-2" />
-                            Leaderboards
-                          </Button>
-                        </div>
-                        <Button
-                          size="lg"
-                          className="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white px-12 py-6 text-xl"
-                          onClick={() => {
-                            setShowMenu(false)
-                            setShowBattleRoyale(true)
-                          }}
-                        >
-                          <Skull className="w-6 h-6 mr-3" />
-                          Enter Battle Royale
-                        </Button>
-                      </div>
-                    </TabsContent>
-
-                    <TabsContent value="cooperative" className="space-y-6">
-                      {/* Co-op Level Selection */}
-                      <Card className="bg-muted/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-500/50">
-                        <CardHeader>
-                          <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 flex items-center gap-2">
-                            <Target className="w-5 h-5 text-emerald-400" />
-                            Select Mission
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-2 gap-3">
-                            {getLevelsForMode('cooperative').map((level) => (
-                              <Card
-                                key={level.id}
-                                onClick={() => setSelectedLevel(level.id)}
-                                className={`cursor-pointer transition-all hover:scale-105 ${
-                                  selectedLevel === level.id
-                                    ? 'ring-2 ring-emerald-500 bg-emerald-500/20'
-                                    : 'bg-muted/50 dark:bg-slate-700/30 hover:bg-muted/80 dark:hover:bg-slate-800/50'
-                                }`}
-                              >
-                                <CardContent className="p-4">
-                                  <div className="text-center">
-                                    <h4 className={`text-lg font-bold mb-1 ${
-                                      level.difficulty === 'easy' ? 'text-green-400' :
-                                      level.difficulty === 'medium' ? 'text-yellow-400' :
-                                      level.difficulty === 'hard' ? 'text-orange-400' :
-                                      'text-red-400'
-                                    }`}>
-                                      {level.name}
-                                    </h4>
-                                    <Badge
-                                      variant="outline"
-                                      className={`border-2 ${
-                                        level.difficulty === 'easy' ? 'border-green-500/50 text-green-500 dark:text-green-400' :
-                                        level.difficulty === 'medium' ? 'border-yellow-500/30 text-yellow-400' :
-                                        level.difficulty === 'hard' ? 'border-orange-500/30 text-orange-400' :
-                                        'border-red-500/30 text-red-400'
-                                      }`}
-                                    >
-                                      {level.difficulty.toUpperCase()}
-                                    </Badge>
-                                  </div>
-                                  <div className="flex items-center justify-between text-xs text-slate-400 mt-2">
-                                    <span>{level.description}</span>
-                                    {selectedLevel === level.id && (
-                                      <Badge className="bg-emerald-500 text-white">
-                                        Selected
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <div className="text-center space-y-4">
-                        <p className="text-foreground/90 dark:text-slate-200 text-lg">
-                          Team up with friends! Work together to achieve shared objectives.
-                        </p>
-                        <div className="flex justify-center gap-4">
-                          <Badge variant="outline" className="border-emerald-500/50 text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20 shadow-lg">
-                            <Heart className="w-3 h-3 mr-1" />
-                            Team-based Gameplay
-                          </Badge>
-                          <Badge variant="outline" className="border-blue-500/30 text-blue-400">
-                            <Target className="w-3 h-3 mr-1" />
-                            Shared Objectives
-                          </Badge>
-                          <Badge variant="outline" className="border-purple-500/30 text-purple-400">
-                            <MessageSquare className="w-3 h-3 mr-1" />
-                            Team Chat
-                          </Badge>
-                        </div>
-                        <div className="flex flex-wrap justify-center gap-3">
-                          <Button
-                            variant="outline"
-                            className="border-green-500/50 text-green-500 dark:text-green-400 hover:bg-gradient-to-r hover:from-green-500 hover:to-emerald-500"
-                            onClick={() => setShowLeaderboard(true)}
-                          >
-                            <Trophy className="w-4 h-4 mr-2" />
-                            Leaderboards
-                          </Button>
-                        </div>
-                        <Button
-                          size="lg"
-                          className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-12 py-6 text-xl"
-                          onClick={() => {
-                            setShowMenu(false)
-                            setShowCoop(true)
-                          }}
-                        >
-                          <Heart className="w-6 h-6 mr-3" />
-                          Enter Co-op
-                        </Button>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            /* Game Interface - Mobile First */
-            <div className="flex flex-col gap-4 justify-center items-center min-h-screen pb-4 px-4">
-              {/* Game Canvas */}
-              <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-slate-300 dark:border-slate-700/50 w-full max-w-md">
-                <CardHeader className="pb-4 px-4 py-4">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="bg-gradient-to-r from-purple-600 dark:from-purple-400 via-pink-500 dark:via-pink-400 to-orange-500 dark:to-orange-400 bg-clip-text text-transparent text-lg">Game Area</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={`h-8 w-8 ${soundEnabled ? 'text-slate-600 dark:text-slate-400 hover:text-green-400' : 'text-slate-400 dark:text-slate-600 hover:text-slate-300'}`}
-                        onClick={() => setSoundEnabled(!soundEnabled)}
-                        title={soundEnabled ? 'Mute Sound' : 'Unmute Sound'}
+              return (
+                <motion.div
+                  key={level.id}
+                  variants={cardVariants}
+                  initial="visible"
+                  animate={isSelected ? 'selected' : 'visible'}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 300 }}
+                  onClick={() => isUnlocked && handleLevelSelect(level)}
+                  className={cn(
+                    'relative overflow-hidden',
+                    isSelected ? 'cursor-pointer' : 'cursor-pointer',
+                  !isUnlocked && 'opacity-60 cursor-not-allowed'
+                  )}
+                  style={{
+                    WebkitTapHighlightColor: 'transparent',
+                    minHeight: '180px',
+                  }}
+                >
+                  {/* Selection Indicator - Full Border */}
+                  <AnimatePresence>
+                    {isSelected && (
+                      <motion.div
+                        className="absolute inset-0 pointer-events-none"
+                        variants={selectionPulseVariants}
+                        initial="selected"
+                        transition={{ duration: 1000, repeat: Infinity }}
                       >
-                        {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                      </Button>
-                      <Badge variant="outline" className="border-slate-600 text-slate-300 text-sm">
-                        {gameState.gameMode}
-                      </Badge>
-                      {gameState.isPaused && (
-                        <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-sm">
-                          Paused
+                        <div className="absolute inset-0 bg-green-500/20 rounded-2xl"></div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Card Header */}
+                  <div className="flex items-center justify-between p-6">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        'text-6xl',
+                        'animate-bounce',
+                        isUnlocked ? 'grayscale' : ''
+                      )}>
+                        {level.icon}
+                      </div>
+                      <div>
+                        <h3 className="text-white text-xl font-bold mb-1">
+                          {level.name}
+                        </h3>
+                        <Badge
+                          variant="secondary"
+                          className={cn(
+                            'text-xs font-semibold px-3 py-1 border-2',
+                            getDifficultyColor(level.difficulty)
+                          )}
+                        >
+                          {level.difficulty.toUpperCase()}
                         </Badge>
-                      )}
+                        {!isUnlocked && (
+                          <Badge variant="destructive" className="ml-2">
+                            🔒
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4 px-4 pb-6">
-                  {/* Statistics - Always visible (Mobile First) */}
-                  <div className="flex flex-wrap justify-around items-center bg-slate-200/50 dark:bg-slate-700/40 rounded-lg p-3 space-x-2 border border-slate-300 dark:border-slate-600">
-                    <div className="text-center">
-                      <div className="text-sm font-semibold text-slate-600 dark:text-slate-400">Score</div>
-                      <div className="text-xl font-bold text-green-400">{gameState.score}</div>
-                    </div>
-                    <div className="w-px h-10 bg-slate-300 dark:bg-slate-700"></div>
-                    <div className="text-center">
-                      <div className="text-sm font-semibold text-slate-600 dark:text-slate-400">Level</div>
-                      <div className="text-xl font-bold text-purple-400">{gameState.level}</div>
-                    </div>
-                    <div className="w-px h-10 bg-slate-300 dark:bg-slate-700"></div>
-                    <div className="text-center">
-                      <div className="text-sm font-semibold text-slate-600 dark:text-slate-400">Length</div>
-                      <div className="text-xl font-bold text-blue-400">{gameState.snake.length}</div>
-                    </div>
-                    <div className="w-px h-10 bg-slate-300 dark:bg-slate-700"></div>
-                    <div className="text-center">
-                      <div className="text-sm font-semibold text-slate-600 dark:text-slate-400">Speed</div>
-                      <div className="text-xl font-bold text-orange-400">{Math.round(150 / gameState.speed * 100)}%</div>
-                    </div>
-                    {gameState.isSpecialFood && (
-                      <>
-                        <div className="w-px h-10 bg-slate-300 dark:bg-slate-700"></div>
-                        <div className="text-center">
-                          <div className="text-sm font-semibold text-yellow-400">⭐ SPECIAL</div>
-                          <div className="text-xl font-bold text-yellow-400">
-                            {Math.max(0, Math.ceil((gameState.specialFoodEndTime - Date.now()) / 1000))}s
-                          </div>
-                        </div>
-                      </>
+
+                    {isUnlocked && (
+                      <div className="text-yellow-300 text-sm">
+                        📏 Unlocked at Level {Math.floor(Math.random() * 3) + 5)}
+                      </div>
                     )}
                   </div>
 
-                  {/* Game Canvas Container - Redesigned */}
-                  <div className="relative">
-                    {/* Decorative outer glow */}
-                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 rounded-2xl blur opacity-20 dark:opacity-30 animate-pulse"></div>
-                    
-                    {/* Game Box Frame */}
-                    <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-1 border-2 border-slate-300 dark:border-slate-600 shadow-2xl">
-                      {/* Corner decorations */}
-                      <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-purple-500 rounded-tl-lg"></div>
-                      <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-pink-500 rounded-tr-lg"></div>
-                      <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-orange-500 rounded-bl-lg"></div>
-                      <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-yellow-500 rounded-br-lg"></div>
-                      
-                      {/* Inner canvas container */}
-                      <div className="relative bg-slate-900 dark:bg-slate-950 rounded-xl overflow-hidden">
-                        {/* Grid pattern background */}
-                        <div className="absolute inset-0 opacity-10 dark:opacity-20">
-                          <div className="w-full h-full" style={{
-                            backgroundImage: `
-                              linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
-                            `,
-                            backgroundSize: '20px 20px'
-                          }}></div>
-                        </div>
-                        
-                        {/* Canvas */}
-                        <div className="relative flex justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-                          <canvas
-                            ref={canvasRef}
-                            width={gameState.canvasSize}
-                            height={gameState.canvasSize}
-                            className="rounded-lg w-full h-auto touch-none relative z-10"
-                            style={{ maxHeight: '45vh', minHeight: '280px' }}
-                          />
+                  {/* Card Content */}
+                  <div className="p-6">
+                    <p className="text-white/90 text-base leading-relaxed mb-6">
+                      {level.description}
+                    </p>
 
-                          {/* Game Over Overlay */}
-                          {gameState.isGameOver && (
-                            <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-20">
-                              <div className="text-center space-y-4 px-4 py-8 w-full max-w-sm">
-                                {/* Game Over Badge */}
-                                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-2 rounded-full shadow-lg shadow-red-500/30">
-                                  <Trophy className="w-6 h-6" />
-                                  <span className="text-lg font-bold">GAME OVER</span>
-                                </div>
-
-                                {/* Score Display */}
-                                <div className="space-y-2">
-                                  <p className="text-4xl font-black bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                                    {gameState.score}
-                                  </p>
-                                  <p className="text-slate-400 text-sm uppercase tracking-widest">Final Score</p>
-                                </div>
-
-                                {/* Stats */}
-                                <div className="flex justify-center gap-8">
-                                  <div className="text-center">
-                                    <p className="text-3xl font-bold text-purple-400">{gameState.level}</p>
-                                    <p className="text-xs text-slate-400 uppercase tracking-wider">Level</p>
-                                  </div>
-                                  <div className="text-center">
-                                    <p className="text-3xl font-bold text-blue-400">{gameState.snake.length}</p>
-                                    <p className="text-xs text-slate-400 uppercase tracking-wider">Length</p>
-                                  </div>
-                                </div>
-
-                                {/* Action Buttons */}
-                                <div className="flex flex-col gap-3 justify-center pt-4">
-                                  <Button
-                                    size="lg"
-                                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-lg px-8 py-6 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-all hover:scale-105"
-                                    onClick={startGame}
-                                  >
-                                    <Play className="w-6 h-6 mr-2" />
-                                    Play Again
-                                  </Button>
-                                  <Button
-                                    size="lg"
-                                    variant="outline"
-                                    className="border-2 border-slate-600 text-slate-300 hover:bg-slate-800/50 hover:border-slate-500 text-lg px-8 py-6 transition-all hover:scale-105"
-                                    onClick={resetGame}
-                                  >
-                                    <Menu className="w-6 h-6 mr-2" />
-                                    Menu
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Pause Overlay */}
-                          {gameState.isPaused && !gameState.isGameOver && (
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-20">
-                              <div className="text-center space-y-4">
-                                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg shadow-yellow-500/30 animate-pulse">
-                                  <Pause className="w-10 h-10 text-white" />
-                                </div>
-                                <h3 className="text-3xl font-bold text-white">PAUSED</h3>
-                                <p className="text-slate-400 text-sm">Tap the play button to continue</p>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Score HUD (Floating) */}
-                          <div className="absolute top-2 left-2 right-2 flex justify-between z-10 pointer-events-none">
-                            <div className="bg-black/20 dark:bg-black/30 backdrop-blur-[2px] rounded-lg px-2 py-1 border border-white/5">
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">Score</span>
-                              <p className="text-lg font-bold text-green-400">{gameState.score}</p>
-                            </div>
-                            <div className="bg-black/20 dark:bg-black/30 backdrop-blur-[2px] rounded-lg px-2 py-1 border border-white/5">
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">Level</span>
-                              <p className="text-base font-bold text-purple-400">{gameState.level}</p>
-                            </div>
-                          </div>
-
-                          {/* Special Food Indicator */}
-                          {gameState.isSpecialFood && (
-                            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg shadow-yellow-500/30 animate-bounce z-10">
-                              ⭐ SPECIAL FOOD - {Math.max(0, Math.ceil((gameState.specialFoodEndTime - Date.now()) / 1000))}s
-                            </div>
-                          )}
-                        </div>
+                    {/* Stats */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-white/80 text-sm">
+                        <span>🏆 Best Score</span>
+                        <span className="font-semibold text-white">
+                          {level.bestScore.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-white/80 text-sm">
+                        <span>⏱️ Average Time</span>
+                        <span className="font-semibold text-white">
+                          {level.avgTime}s
+                        </span>
                       </div>
                     </div>
+
+                    {/* Play Button - Only visible when selected */}
+                    {isSelected && (
+                      <motion.div
+                        className="mt-4"
+                        initial="hidden"
+                        animate="visible"
+                        transition={{ delay: 0.2 }}
+                      >
+                        <motion.button
+                          variants={startButtonVariants}
+                          initial="idle"
+                          animate={startButtonPulse ? 'idle2' : 'idle'}
+                          whileTap="pressed"
+                          whileHover={{ scale: 1.05 }}
+                          onClick={() => {
+                            // Start game logic
+                            console.log('Starting game:', level.name)
+                          }}
+                          className={cn(
+                            'w-full h-16',
+                            'bg-gradient-to-r from-green-500 to-emerald-600',
+                            'text-white font-bold text-lg',
+                            'rounded-2xl',
+                            'shadow-2xl',
+                            'border-4',
+                            'border-green-400/30',
+                            'flex items-center justify-center',
+                            'gap-3',
+                            'relative',
+                            'overflow-hidden',
+                          )}
+                          style={{
+                            background: `linear-gradient(135deg, ${level.color}, ${level.color}dd)`,
+                          }}
+                        >
+                          <motion.div
+                            className="absolute inset-0 pointer-events-none"
+                            animate={{
+                              boxShadow: isSelected && startButtonPulse ? 'selected' : 'hidden',
+                            }}
+                            transition={{ duration: 500 }}
+                          >
+                          </motion.div>
+                          <motion.span
+                            className="relative z-10"
+                            animate={{ scale: [1, 1], [1, 0.95] }}
+                            transition={{ duration: 300, delay: 0.2 }}
+                          >
+                            <span className="mr-2 text-2xl">▶️</span>
+                            <span className="relative">
+                              PLAY {level.name.toUpperCase()}
+                            </span>
+                          </motion.span>
+                        </motion.button>
+                      </motion.div>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Touch Controls - D-Pad Style */}
-              <div className="w-full pb-4 pt-2">
-                <div className="flex flex-col items-center space-y-3">
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Controls</p>
-                  {/* D-Pad */}
-                  <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-lg rounded-2xl p-4 border-2 border-slate-400 dark:border-slate-600 shadow-2xl">
-                    <div className="grid grid-cols-3 gap-3">
-                          {/* Empty top corners */}
-                          <div className="w-14 h-14"></div>
-                          {/* Up Button */}
-                          <button
-                            className={`w-14 h-14 rounded-xl text-2xl font-bold transition-all duration-100 active:scale-95 select-none ${
-                              gameState.direction === 'up'
-                                ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
-                                : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
-                            }`}
-                            onClick={() => {
-                              if (gameState.direction !== 'down') {
-                                setGameState(prev => ({ ...prev, direction: 'up' }))
-                              }
-                            }}
-                          >
-                            ▲
-                          </button>
-                          {/* Empty top right */}
-                          <div className="w-14 h-14"></div>
-
-                          {/* Left Button */}
-                          <button
-                            className={`w-14 h-14 rounded-lg text-2xl font-bold transition-all duration-100 active:scale-95 select-none ${
-                              gameState.direction === 'left'
-                                ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
-                                : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
-                            }`}
-                            onClick={() => {
-                              if (gameState.direction !== 'right') {
-                                setGameState(prev => ({ ...prev, direction: 'left' }))
-                              }
-                            }}
-                          >
-                            ◀
-                          </button>
-                          {/* Center - Action Button */}
-                          <button
-                            className={`w-14 h-14 rounded-lg text-xl font-bold transition-all duration-100 active:scale-95 select-none ${
-                              gameState.isPaused
-                                ? 'bg-gradient-to-br from-green-600 to-green-800 text-white shadow-lg shadow-green-500/50'
-                                : 'bg-gradient-to-br from-yellow-600 to-yellow-800 text-white shadow-lg shadow-yellow-500/50'
-                            }`}
-                            onClick={pauseGame}
-                          >
-                            {gameState.isPaused ? '▶' : '⏸'}
-                          </button>
-                          {/* Right Button */}
-                          <button
-                            className={`w-14 h-14 rounded-lg text-2xl font-bold transition-all duration-100 active:scale-95 select-none ${
-                              gameState.direction === 'right'
-                                ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
-                                : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
-                            }`}
-                            onClick={() => {
-                              if (gameState.direction !== 'left') {
-                                setGameState(prev => ({ ...prev, direction: 'right' }))
-                              }
-                            }}
-                          >
-                            ▶
-                          </button>
-
-                          {/* Empty bottom left */}
-                          <div className="w-14 h-14"></div>
-                          {/* Down Button */}
-                          <button
-                            className={`w-14 h-14 rounded-lg text-2xl font-bold transition-all duration-100 active:scale-95 select-none ${
-                              gameState.direction === 'down'
-                                ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-500/50'
-                                : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 active:from-purple-600 active:to-purple-800 active:text-white'
-                            }`}
-                            onClick={() => {
-                              if (gameState.direction !== 'up') {
-                                setGameState(prev => ({ ...prev, direction: 'down' }))
-                              }
-                            }}
-                          >
-                            ▼
-                          </button>
-                          {/* Empty bottom right */}
-                          <div className="w-14 h-14"></div>
-                        </div>
-                      </div>
-
-                      {/* Action Bar */}
-                      <div className="flex gap-3 justify-center">
-                        <Button
-                          variant="outline"
-                          size="default"
-                          className="w-12 h-12 bg-white/50 dark:bg-slate-800/90 border-slate-400 dark:border-slate-600/60 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 active:bg-slate-200 dark:active:bg-slate-600"
-                          onClick={() => setShowMenu(true)}
-                        >
-                          <Menu className="w-5 h-5" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="default"
-                          className="w-12 h-12 bg-white/50 dark:bg-slate-800/90 border-red-500/60 dark:border-red-600/60 text-red-500 dark:text-red-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:border-red-500/60 dark:hover:border-red-500/60 active:bg-slate-200 dark:active:bg-slate-600"
-                          onClick={resetGame}
-                        >
-                          <RotateCcw className="w-5 h-5" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Controls Info Card */}
-                    <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-600/50 w-full mt-3">
-                      <CardHeader className="pb-3 px-4">
-                        <CardTitle className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 text-sm">Controls</CardTitle>
-                      </CardHeader>
-                      <CardContent className="px-4 pb-3">
-                        <div className="text-sm text-slate-500 dark:text-slate-400 space-y-1">
-                          <p>• Tap D-Pad: Move snake</p>
-                          <p>• Center Button: Pause/Resume</p>
-                          <p>• Menu/Restart: Quick actions</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Action Buttons Card */}
-                    <Card className="bg-white/50 dark:bg-slate-700/40 backdrop-blur-xl border-border dark:border-slate-600/50 w-full mt-2">
-                      <CardContent className="pt-3 pb-3 px-4 space-y-2">
-                        <Button
-                          className="w-full text-sm h-10"
-                          variant="outline"
-                          onClick={pauseGame}
-                        >
-                          {gameState.isPaused ? (
-                            <>
-                              <Play className="w-4 h-4 mr-2" />
-                              Resume
-                            </>
-                          ) : (
-                            <>
-                              <Pause className="w-4 h-4 mr-2" />
-                              Pause
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          className="w-full text-sm h-10"
-                          variant="outline"
-                          onClick={startGame}
-                        >
-                          <RotateCcw className="w-4 h-4 mr-2" />
-                          Restart
-                        </Button>
-                        <Button
-                          className="w-full text-sm h-10"
-                          variant="outline"
-                          onClick={() => setShowMenu(true)}
-                        >
-                          <Menu className="w-4 h-4 mr-2" />
-                          Main Menu
-                        </Button>
-                      </CardContent>
-                    </Card>
-              </div>
-            </div>
-          )}
+                </motion.div>
+              )
+            })}
+          </div>
         </div>
       </main>
 
-      {/* Settings Dialog */}
-      <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="bg-slate-800 backdrop-blur-xl border-slate-700/50 text-white">
-          <DialogHeader>
-            <DialogTitle>Settings</DialogTitle>
-            <DialogDescription className="text-muted-foreground dark:text-slate-200">
-              Customize your game experience
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6 py-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  {soundEnabled ? <Volume2 className="w-4 h-4 text-green-400" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
-                  Sound Effects
-                </label>
-                <Button
-                  variant={soundEnabled ? "default" : "outline"}
-                  size="sm"
-                  className={soundEnabled ? "bg-green-600 hover:bg-green-700" : ""}
-                  onClick={() => setSoundEnabled(!soundEnabled)}
-                >
-                  {soundEnabled ? 'On' : 'Off'}
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <label className="text-sm font-medium">Difficulty Level</label>
-              <Slider
-                value={difficulty}
-                onValueChange={setDifficulty}
-                max={5}
-                min={1}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-slate-400">
-                <span>Easy</span>
-                <span>Hard</span>
-              </div>
-            </div>
+      {/* Action Buttons */}
+      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-b from-black/80 to-black/90 backdrop-blur-lg border-t border-white/10">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white/60 hover:bg-white/10"
+          >
+            <Bell className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white/60 hover:bg-white/10"
+          >
+            <Settings className="w-5 h-5" />
+          </Button>
+          <div className="flex items-center gap-2">
+            <Users className="text-white/60" />
+            <Badge variant="secondary" className="text-white">
+              3,240
+            </Badge>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Auth Dialog */}
-      <AuthDialog
-        open={showLogin}
-        onOpenChange={setShowLogin}
-        onLoginSuccess={handleLogin}
-      />
-
-      {/* Admin Dashboard */}
-      {showAdmin && <AdminDashboard onClose={() => setShowAdmin(false)} />}
-
-      {/* Footer */}
-      <footer className="bg-background/80 dark:bg-slate-700/30 backdrop-blur-lg border-t border-border dark:border-slate-500/50 px-6 py-4 mt-auto">
-        <div className="max-w-7xl mx-auto text-center text-slate-400 text-sm">
-          © 2025 Snake Game Ultimate Edition.
         </div>
       </footer>
     </div>
   )
+}
+
+// Helper function
+function cn(...classes: (string | undefined | boolean | null)[]) {
+  return classes.filter(Boolean).join(' ')
 }
